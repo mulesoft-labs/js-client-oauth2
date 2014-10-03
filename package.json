@@ -1,0 +1,42 @@
+{
+  "name": "client-oauth2",
+  "version": "0.0.0",
+  "description": "A no-dependency library for executing OAuth 2.0 flows.",
+  "main": "client-oauth2.js",
+  "scripts": {
+    "test": "gulp lint && gulp test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/mulesoft/js-client-oauth2.git"
+  },
+  "keywords": [
+    "oauth2",
+    "authentication",
+    "token"
+  ],
+  "author": "MuleSoft, Inc.",
+  "license": "Apache 2.0",
+  "bugs": {
+    "url": "https://github.com/mulesoft/js-client-oauth2/issues"
+  },
+  "homepage": "https://github.com/mulesoft/js-client-oauth2",
+  "devDependencies": {
+    "chai": "^1.9.1",
+    "gulp": "^3.8.6",
+    "gulp-jshint": "^1.8.4",
+    "karma": "^0.12.23",
+    "karma-chrome-launcher": "^0.1.4",
+    "karma-coverage": "^0.2.6",
+    "karma-firefox-launcher": "^0.1.3",
+    "karma-mocha": "^0.1.9",
+    "karma-phantomjs-launcher": "^0.1.4",
+    "karma-sinon-chai": "^0.2.0",
+    "mocha": "^1.21.3",
+    "nock": "^0.46.0",
+    "require-dir": "^0.1.0"
+  },
+  "dependencies": {
+    "gulp-mocha": "^1.1.0"
+  }
+}
