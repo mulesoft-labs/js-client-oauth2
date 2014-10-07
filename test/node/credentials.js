@@ -10,7 +10,7 @@ describe('credentials', function () {
     authorizationUri:    'https://github.com/login/oauth/authorize',
     authorizationGrants: ['credentials'],
     redirectUri:         'http://example.com/auth/callback',
-    scope:               'notifications'
+    scopes:              ['notifications']
   });
 
   describe('#getToken', function () {

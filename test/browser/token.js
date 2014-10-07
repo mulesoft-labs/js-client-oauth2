@@ -6,7 +6,7 @@ describe('token', function () {
     authorizationUri:    'https://github.com/login/oauth/authorize',
     authorizationGrants: ['code'],
     redirectUri:         'http://example.com/auth/callback',
-    scope:               'notifications'
+    scopes:              'notifications'
   });
 
   describe('#getUri', function () {

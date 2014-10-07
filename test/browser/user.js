@@ -6,7 +6,7 @@ describe('user token instance', function () {
     authorizationUri:    'https://github.com/login/oauth/authorize',
     authorizationGrants: ['code'],
     redirectUri:         'http://example.com/auth/callback',
-    scope:               'notifications'
+    scopes:              ['notifications']
   });
 
   var token       = githubAuth.createToken('abc123token');

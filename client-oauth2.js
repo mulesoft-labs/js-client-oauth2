@@ -265,6 +265,20 @@
   }
 
   /**
+   * Sanitize the scopes option to be a string.
+   *
+   * @param  {Array}  scopes
+   * @return {String}
+   */
+  function sanitizeScope (scopes) {
+    if (!Array.isArray(scopes)) {
+      return scopes == null ? null : String(scopes);
+    }
+
+    return scopes.join(' ');
+  }
+
+  /**
    * Construct an object that can handle the multiple OAuth 2.0 flows.
    *
    * @param {Object} options
@@ -585,7 +599,7 @@
         'Authorization': 'Basic ' + authorization
       },
       body: uriEncode({
-        scope:      options.scope,
+        scope:      sanitizeScope(options.scopes),
         username:   username,
         password:   password,
         grant_type: 'password'
@@ -629,7 +643,7 @@
 
     return options.authorizationUri + '?' + uriEncode({
       state:         options.state,
-      scope:         options.scope,
+      scope:         sanitizeScope(options.scopes),
       client_id:     options.clientId,
       redirect_uri:  options.redirectUri,
       response_type: 'token'
@@ -735,7 +749,7 @@
         'Authorization': 'Basic ' + authorization
       },
       body: uriEncode({
-        scope:      options.scope,
+        scope:      sanitizeScope(options.scopes),
         grant_type: 'client_credentials'
       })
     }, function (err, data) {
@@ -776,7 +790,7 @@
 
     return options.authorizationUri + '?' + uriEncode({
       state:         options.state,
-      scope:         options.scope,
+      scope:         sanitizeScope(options.scopes),
       client_id:     options.clientId,
       redirect_uri:  options.redirectUri,
       response_type: 'code'
