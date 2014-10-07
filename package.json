@@ -1,6 +1,6 @@
 {
   "name": "client-oauth2",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "A no-dependency library for executing OAuth 2.0 flows.",
   "main": "client-oauth2.js",
   "scripts": {
