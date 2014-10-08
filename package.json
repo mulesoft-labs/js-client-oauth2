@@ -25,6 +25,7 @@
     "chai": "^1.9.1",
     "gulp": "^3.8.6",
     "gulp-jshint": "^1.8.4",
+    "is-travis": "^1.0.0",
     "karma": "^0.12.23",
     "karma-chrome-launcher": "^0.1.4",
     "karma-coverage": "^0.2.6",

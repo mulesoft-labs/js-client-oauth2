@@ -1,4 +1,5 @@
-var path = require('path');
+var path     = require('path');
+var isTravis = require('is-travis');
 
 /**
  * Initialize Karma with config information.
@@ -102,7 +103,7 @@ module.exports = function (config) {
      *
      * @type {Array}
      */
-    browsers: ['Chrome', 'Firefox', 'PhantomJS'],
+    browsers: isTravis ? ['PhantomJS'] : ['Chrome', 'Firefox', 'PhantomJS'],
 
     /**
      * If a browser does not capture within a given timeout, kill it.
