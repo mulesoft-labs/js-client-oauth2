@@ -123,5 +123,5 @@ Apache 2.0
 
 [npm-image]: https://img.shields.io/npm/v/client-oauth2.svg?style=flat
 [npm-url]: https://npmjs.org/package/client-oauth2
-[travis-image]: https://img.shields.io/travis/mulesoft-labs/client-oauth2.svg?style=flat
-[travis-url]: https://travis-ci.org/mulesoft-labs/client-oauth2
+[travis-image]: https://img.shields.io/travis/mulesoft/js-client-oauth2.svg?style=flat
+[travis-url]: https://travis-ci.org/mulesoft/js-client-oauth2
