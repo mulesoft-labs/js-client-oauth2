@@ -25,6 +25,7 @@
     "chai": "^1.9.1",
     "gulp": "^3.8.6",
     "gulp-jshint": "^1.8.4",
+    "gulp-mocha": "^1.1.0",
     "is-travis": "^1.0.0",
     "karma": "^0.12.23",
     "karma-chrome-launcher": "^0.1.4",
@@ -36,8 +37,5 @@
     "mocha": "^1.21.3",
     "nock": "^0.46.0",
     "require-dir": "^0.1.0"
-  },
-  "dependencies": {
-    "gulp-mocha": "^1.1.0"
   }
 }
