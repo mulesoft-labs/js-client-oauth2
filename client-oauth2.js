@@ -136,6 +136,10 @@
    * @return {String}
    */
   function encodeComponent (str) {
+    if (str == null) {
+      return '';
+    }
+
     return encodeURIComponent(str)
       .replace(/[!'()]/g, root.escape)
       .replace(/\*/g, '%2A');
