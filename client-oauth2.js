@@ -439,7 +439,10 @@
       req.on('error', done);
 
       // Send the body and make the request.
-      req.write(options.body);
+      if (options.body != null) {
+        req.write(options.body);
+      }
+
       req.end();
     };
   }
