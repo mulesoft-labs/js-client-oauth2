@@ -1,6 +1,9 @@
 (function (root) {
+  var isBrowser       = typeof window === 'object';
+  var hasBuffer       = typeof Buffer === 'function';
   var _hasOwnProperty = Object.prototype.hasOwnProperty;
-  var btoa            = typeof Buffer === 'function' ? bufferBtoa : root.btoa;
+  var btoa            = hasBuffer ? btoaBuffer : root.btoa;
+  var popsicle        = isBrowser ? root.popsicle : require('popsicle');
 
   /**
    * Format error response types to regular strings for displaying to clients.
@@ -86,7 +89,7 @@
    * @param  {String} string
    * @return {String}
    */
-  function bufferBtoa (string) {
+  function btoaBuffer (string) {
     return new Buffer(string).toString('base64');
   }
 
@@ -130,62 +133,6 @@
   }
 
   /**
-   * Attempt (and fix) URI component encoding.
-   *
-   * @param  {String} str
-   * @return {String}
-   */
-  function encodeComponent (str) {
-    if (str == null) {
-      return '';
-    }
-
-    return encodeURIComponent(str)
-      .replace(/[!'()]/g, root.escape)
-      .replace(/\*/g, '%2A');
-  }
-
-  /**
-   * Attempt URI component decoding.
-   *
-   * @param  {String} str
-   * @return {String}
-   */
-  function decodeComponent (str) {
-    return decodeURIComponent(str);
-  }
-
-  /**
-   * Convert an object into a query string.
-   *
-   * @param  {Object} obj
-   * @param  {String} sep
-   * @param  {String} eq
-   * @return {String}
-   */
-  function uriEncode (obj, sep, eq) {
-    var params = [];
-
-    eq  = eq  || '=';
-    sep = sep || '&';
-
-    Object.keys(obj).forEach(function (key) {
-      var value  = obj[key];
-      var keyStr = encodeComponent(key) + eq;
-
-      if (Array.isArray(value)) {
-        for (var i = 0; i < value.length; i++) {
-          params.push(keyStr + encodeComponent(value[i]));
-        }
-      } else if (value != null) {
-        params.push(keyStr + encodeComponent(value));
-      }
-    });
-
-    return params.join(sep);
-  }
-
-  /**
    * Convert a query string into an object.
    *
    * @param  {String} qs
@@ -193,14 +140,14 @@
    * @param  {String} eq
    * @return {Object}
    */
-  function uriDecode (qs, sep, eq) {
+  function decodeQuery (qs, sep, eq) {
     eq  = eq  || '=';
     sep = sep || '&';
     qs  = qs.split(sep);
 
     var obj     = {};
     var maxKeys = 1000;
-    var len     = qs.length > maxKeys ? maxKeys : qs.length;
+    var len     = Math.min(qs.length, maxKeys);
 
     for (var i = 0; i < len; i++) {
       var key   = qs[i].replace(/\+/g, '%20');
@@ -212,8 +159,8 @@
         key   = key.substr(0, index);
       }
 
-      key   = decodeComponent(key);
-      value = decodeComponent(value);
+      key   = decodeURIComponent(key);
+      value = decodeURIComponent(value);
 
       if (!_hasOwnProperty.call(obj, key)) {
         obj[key] = value;
@@ -243,29 +190,21 @@
   }
 
   /**
-   * Retrieve all the HTTP response headers for an XMLHttpRequest instance.
+   * Handle the authentication response object.
    *
-   * @param  {XMLHttpRequest} xhr
-   * @return {Object}
+   * @param  {Object}  res
+   * @return {Promise}
    */
-  function getAllReponseHeaders (xhr) {
-    var headers = {};
+  function handleAuthResponse (res) {
+    var data = res.body;
+    var err  = getAuthError(data);
 
-    // Split all header lines and iterate.
-    xhr.getAllResponseHeaders().split('\n').forEach(function (header) {
-      var index = header.indexOf(':');
+    // If the response contains an error, reject the refresh token.
+    if (err) {
+      return Promise.reject(err);
+    }
 
-      if (index === -1) {
-        return;
-      }
-
-      var name  = header.substr(0, index).toLowerCase();
-      var value = header.substr(index + 1).trim();
-
-      headers[name] = value;
-    });
-
-    return headers;
+    return data;
   }
 
   /**
@@ -276,10 +215,40 @@
    */
   function sanitizeScope (scopes) {
     if (!Array.isArray(scopes)) {
-      return scopes == null ? null : String(scopes);
+      return scopes == null ? '' : String(scopes);
     }
 
     return scopes.join(' ');
+  }
+
+  /**
+   * Create a request uri based on an options object and token type.
+   *
+   * @param  {Object} options
+   * @param  {String} tokenType
+   * @return {String}
+   */
+  function createUri (options, tokenType) {
+    // Check the required parameters have been set.
+    expects(options, [
+      'clientId',
+      'redirectUri',
+      'authorizationUri'
+    ]);
+
+    var clientId    = encodeURIComponent(options.clientId);
+    var redirectUri = encodeURIComponent(options.redirectUri);
+    var scopes      = encodeURIComponent(sanitizeScope(options.scopes));
+    var uri         = options.authorizationUri + '?client_id=' + clientId +
+      '&redirect_uri=' + redirectUri +
+      '&scope=' + scopes +
+      '&response_type=' + tokenType;
+
+    if (options.state) {
+      uri += '&state=' + encodeURIComponent(options.state);
+    }
+
+    return uri;
   }
 
   /**
@@ -313,143 +282,39 @@
    * @return {Object}
    */
   ClientOAuth2.prototype.createToken = function (access, refresh, type, data) {
-    return new ClientOAuth2Token(this, assign({}, data, {
+    data = assign({}, data, {
       access_token:  access,
       refresh_token: refresh,
       token_type:    type
-    }));
+    });
+
+    return new ClientOAuth2Token(this, data);
   };
 
   /**
    * Using the built-in request method, we'll automatically attempt to parse
    * the response.
    *
-   * @param {Object}   options
-   * @param {Function} done
+   * @param  {Object}  options
+   * @return {Promise}
    */
-  ClientOAuth2.prototype._request = function (options, done) {
-    return this.request(options, function (err, res) {
-      if (err) {
-        return done(err);
-      }
+  ClientOAuth2.prototype._request = function (options) {
+    return this.request(options)
+      .then(function (res) {
+        if (res.status < 200 || res.status >= 300) {
+          var err = new Error('HTTP status ' + res.status);
+          err.status = res.status;
+          return Promise.reject(err);
+        }
 
-      // Check the response status and fail.
-      if (res.status && Math.floor(res.status / 100) !== 2) {
-        err = new Error('HTTP Status ' + res.status);
-        err.status = res.status;
-
-        return done(err);
-      }
-
-      // Support already parsed responses in case of custom body parsing.
-      if (typeof res.body !== 'string') {
-        return done(null, res.body);
-      }
-
-      // Attempt to parse as JSON, falling back to parsing as a query string.
-      try {
-        done(null, JSON.parse(res.body));
-      } catch (e) {
-        done(null, uriDecode(res.body));
-      }
-    });
+        return res;
+      });
   };
 
-  if (typeof window !== 'undefined') {
-    /**
-     * Make a HTTP request using XMLHttpRequest.
-     *
-     * @param {Object}   options
-     * @param {Function} done
-     */
-    ClientOAuth2.prototype.request = function (options, done) {
-      var xhr     = new root.XMLHttpRequest();
-      var headers = options.headers || {};
-
-      // Open the request to the uri and method.
-      xhr.open(options.method, options.uri);
-
-      // When the request has loaded, attempt to automatically parse the body.
-      xhr.onload = function () {
-        return done(null, {
-          raw:     xhr,
-          status:  xhr.status,
-          headers: getAllReponseHeaders(xhr),
-          body:    xhr.responseText
-        });
-      };
-
-      // Catch request errors.
-      xhr.onerror = xhr.onabort = function () {
-        return done(new Error(xhr.statusText || 'XHR aborted'));
-      };
-
-      // Set all request headers.
-      Object.keys(headers).forEach(function (header) {
-        xhr.setRequestHeader(header, headers[header]);
-      });
-
-      // Make the request with the body.
-      xhr.send(options.body);
-    };
-  } else {
-    var url   = require('url');
-    var http  = require('http');
-    var https = require('https');
-
-    /**
-     * Make a request using the built-in node http library.
-     *
-     * @param {Object}   options
-     * @param {Function} done
-     */
-    ClientOAuth2.prototype.request = function (options, done) {
-      var lib     = http;
-      var reqOpts = url.parse(options.uri);
-
-      // If the protocol is over https, switch request library.
-      if (reqOpts.protocol === 'https:') {
-        lib = https;
-      }
-
-      // Alias request options.
-      reqOpts.method  = options.method;
-      reqOpts.headers = options.headers;
-
-      // Send the http request and listen for the response to finish.
-      var req = lib.request(reqOpts, function (res) {
-        var data = '';
-
-        // Callback to `done` if a response error occurs.
-        res.on('error', done);
-
-        // Concat all the data chunks into a string.
-        res.on('data', function (chunk) {
-          data += chunk;
-        });
-
-        // When the response is finished, attempt to parse the data string.
-        res.on('end', function () {
-          return done(null, {
-            raw:     res,
-            status:  res.statusCode,
-            headers: res.headers,
-            body:    data
-          });
-        });
-      });
-
-      // Callback to `done` if a request error occurs.
-      req.on('error', done);
-
-      // Send the body and make the request.
-      if (options.body != null) {
-        req.write(options.body);
-      }
-
-      req.end();
-    };
-  }
+  /**
+   * Set `popsicle` as the default request method.
+   */
+  ClientOAuth2.prototype.request = popsicle;
 
   /**
    * General purpose client token generator.
@@ -513,52 +378,49 @@
   /**
    * Make a HTTP request as the user.
    *
-   * @param {Object}   opts
-   * @param {Function} done
+   * @param  {Object}  opts
+   * @return {Promise}
    */
-  ClientOAuth2Token.prototype.request = function (opts, done) {
-    return this.client.request(this.sign(opts), done);
+  ClientOAuth2Token.prototype.request = function (opts) {
+    return this.client.request(this.sign(opts));
   };
 
   /**
    * Refresh a user access token with the supplied token.
    *
-   * @param {Function} done
+   * @return {Promise}
    */
-  ClientOAuth2Token.prototype.refresh = function (done) {
+  ClientOAuth2Token.prototype.refresh = function () {
     var self    = this;
     var options = this.client.options;
 
     if (!this.refreshToken) {
-      return done(new Error('No refresh token set'));
+      return Promise.reject(new Error('No refresh token set'));
     }
 
     var authorization = btoa(options.clientId + ':' + options.clientSecret);
 
     return this.client._request({
-      uri: options.accessTokenUri,
+      url: options.accessTokenUri,
       method: 'POST',
       headers: {
         'Accept':        'application/json, application/x-www-form-urlencoded',
         'Content-Type':  'application/x-www-form-urlencoded',
         'Authorization': 'Basic ' + authorization
       },
-      body: uriEncode({
+      body: {
         refresh_token: this.refreshToken,
         grant_type:    'refresh_token'
-      })
-    }, function (err, data) {
-      // If an error exists or the data contains an error, return `done`.
-      if (err || (err = getAuthError(data))) {
-        return done(err);
       }
+    })
+      .then(handleAuthResponse)
+      .then(function (data) {
+        // Update stored tokens on the current instance.
+        self.accessToken  = data.access_token;
+        self.refreshToken = data.refresh_token;
 
-      // Update stored tokens on the current instance.
-      self.accessToken  = data.access_token;
-      self.refreshToken = data.refresh_token;
-
-      return done(null, self);
-    });
+        return self;
+      });
   };
 
   /**
@@ -588,37 +450,34 @@
   /**
    * Make a request on behalf of the user credentials to get an acces token.
    *
-   * @param {String}   username
-   * @param {String}   password
-   * @param {Function} done
+   * @param  {String}  username
+   * @param  {String}  password
+   * @return {Promise}
    */
-  OwnerFlow.prototype.getToken = function (username, password, done) {
+  OwnerFlow.prototype.getToken = function (username, password) {
     var self          = this;
     var options       = this.client.options;
     var authorization = btoa(options.clientId + ':' + options.clientSecret);
 
     return this.client._request({
-      uri: options.accessTokenUri,
+      url: options.accessTokenUri,
       method: 'POST',
       headers: {
         'Accept':        'application/json, application/x-www-form-urlencoded',
         'Content-Type':  'application/x-www-form-urlencoded',
         'Authorization': 'Basic ' + authorization
       },
-      body: uriEncode({
+      body: {
         scope:      sanitizeScope(options.scopes),
         username:   username,
         password:   password,
         grant_type: 'password'
-      })
-    }, function (err, data) {
-      // If an error exists or the data contains an error, return `done`.
-      if (err || (err = getAuthError(data))) {
-        return done(err);
       }
-
-      return done(null, new ClientOAuth2Token(self, data));
-    });
+    })
+      .then(handleAuthResponse)
+      .then(function (data) {
+        return new ClientOAuth2Token(self, data);
+      });
   };
 
   /**
@@ -641,73 +500,65 @@
   TokenFlow.prototype.getUri = function (options) {
     options = assign({}, this.client.options, options);
 
-    // Check the parameters have been set.
-    expects(options, [
-      'clientId',
-      'redirectUri',
-      'authorizationUri'
-    ]);
-
-    return options.authorizationUri + '?' + uriEncode({
-      state:         options.state,
-      scope:         sanitizeScope(options.scopes),
-      client_id:     options.clientId,
-      redirect_uri:  options.redirectUri,
-      response_type: 'token'
-    });
+    return createUri(options, 'token');
   };
 
   /**
    * Get the user access token from the uri.
    *
-   * @param {String}   uri
-   * @param {String}   [state]
-   * @param {Function} done
+   * @param  {String}  uri
+   * @param  {String}  [state]
+   * @return {Promise}
    */
-  TokenFlow.prototype.getToken = function (uri, state, done) {
+  TokenFlow.prototype.getToken = function (uri, state) {
+    var data    = {};
     var options = this.client.options;
-    var err;
-
-    // State is an optional pass in.
-    if (typeof state === 'function') {
-      done  = state;
-      state = null;
-    }
 
     // Make sure the uri matches our expected redirect uri.
     if (uri.substr(0, options.redirectUri.length) !== options.redirectUri) {
-      return done(new Error('Invalid uri (should to match redirect): ' + uri));
+      return Promise.reject(new Error('Should match redirect uri: ' + uri));
     }
 
-    var queryString    = uri.replace(/^[^\?]*|\#.*$/g, '').substr(1);
-    var fragmentString = uri.replace(/^[^\#]*/, '').substr(1);
+    var queryIndex    = uri.indexOf('?');
+    var fragmentIndex = uri.indexOf('#');
 
-    // Check whether a query string is present in the uri.
-    if (!queryString && !fragmentString) {
-      return done(new Error('Unable to process uri: ' + uri));
+    // If no query string or fragment exists, we won't be able to parse
+    // any useful information from the uri.
+    if (queryIndex === -1 && fragmentIndex === -1) {
+      return Promise.reject(new Error('Unable to process uri: ' + uri));
     }
 
-    // Merge the fragment with the the query string. This is because, at least,
-    // Instagram has a bug where the OAuth 2.0 state is being passed back as
-    // part of the query string instead of the fragment. For example:
-    // "?state=123#access_token=abc"
-    var data = assign(
-      queryString ? uriDecode(queryString) : {},
-      fragmentString ? uriDecode(fragmentString) : {}
-    );
+    // Extract the query string and parse. This is needed because Instagram
+    // has a bug where the OAuth 2.0 state is passed back via the query string.
+    if (queryIndex > -1 && queryIndex < fragmentIndex) {
+      var endIndex = fragmentIndex === -1 ? uri.length : fragmentIndex;
+      var query    = uri.slice(queryIndex + 1, endIndex);
+
+      assign(data, decodeQuery(query));
+    }
+
+    // Extract data from the uri fragment, which is more important than the
+    // query string which shouldn't hold any information.
+    if (fragmentIndex > -1) {
+      var fragment = uri.substr(fragmentIndex + 1);
+
+      assign(data, decodeQuery(fragment));
+    }
+
+    var err = getAuthError(data);
 
     // Check if the query string was populated with a known error.
-    if (err = getAuthError(data)) {
-      return done(err);
+    if (err) {
+      return Promise.reject(err);
     }
 
-    // Check whether the state is correct.
-    if (state && data.state !== state) {
-      return done(new Error('Invalid state:' + data.state));
+    // Check whether the state matches.
+    if (state != null && data.state !== state) {
+      return Promise.reject(new Error('Invalid state: ' + data.state));
     }
 
     // Initalize a new token and return.
-    return done(null, new ClientOAuth2Token(this, data));
+    return Promise.resolve(new ClientOAuth2Token(this, data));
   };
 
   /**
@@ -724,17 +575,11 @@
   /**
    * Request an access token using the client credentials.
    *
-   * @param {Object}   [options]
-   * @param {Function} done
+   * @param  {Object}  [options]
+   * @return {Promise}
    */
-  CredentialsFlow.prototype.getToken = function (options, done) {
+  CredentialsFlow.prototype.getToken = function (options) {
     var self = this;
-
-    // Allow the options argument to be omitted.
-    if (typeof options === 'function') {
-      done = options;
-      options = null;
-    }
 
     options = assign({}, this.client.options, options);
 
@@ -748,25 +593,22 @@
     var authorization = btoa(options.clientId + ':' + options.clientSecret);
 
     return this.client._request({
-      uri: options.accessTokenUri,
+      url: options.accessTokenUri,
       method: 'POST',
       headers: {
         'Accept':        'application/json, application/x-www-form-urlencoded',
         'Content-Type':  'application/x-www-form-urlencoded',
         'Authorization': 'Basic ' + authorization
       },
-      body: uriEncode({
+      body: {
         scope:      sanitizeScope(options.scopes),
         grant_type: 'client_credentials'
-      })
-    }, function (err, data) {
-      // If an error exists or the data contains an error, return `done`.
-      if (err || (err = getAuthError(data))) {
-        return done(err);
       }
-
-      return done(null, new ClientOAuth2Token(self, data));
-    });
+    })
+      .then(handleAuthResponse)
+      .then(function (data) {
+        return new ClientOAuth2Token(self, data);
+      });
   };
 
   /**
@@ -788,40 +630,20 @@
   CodeFlow.prototype.getUri = function (options) {
     options = assign({}, this.client.options, options);
 
-    // Check the parameters have been set.
-    expects(options, [
-      'clientId',
-      'redirectUri',
-      'authorizationUri'
-    ]);
-
-    return options.authorizationUri + '?' + uriEncode({
-      state:         options.state,
-      scope:         sanitizeScope(options.scopes),
-      client_id:     options.clientId,
-      redirect_uri:  options.redirectUri,
-      response_type: 'code'
-    });
+    return createUri(options, 'code');
   };
 
   /**
    * Get the code token from the redirected uri and make another request for
    * the user access token.
    *
-   * @param {String}   uri
-   * @param {String}   [state]
-   * @param {Function} done
+   * @param  {String}  uri
+   * @param  {String}  [state]
+   * @return {Promise}
    */
-  CodeFlow.prototype.getToken = function (uri, state, done) {
+  CodeFlow.prototype.getToken = function (uri, state) {
     var self    = this;
     var options = this.client.options;
-    var err;
-
-    // State is an optional pass in.
-    if (typeof state === 'function') {
-      done  = state;
-      state = null;
-    }
 
     expects(options, [
       'clientId',
@@ -832,56 +654,52 @@
 
     // Make sure the uri matches our expected redirect uri.
     if (uri.substr(0, options.redirectUri.length) !== options.redirectUri) {
-      return done(new Error('Invalid uri (should to match redirect): ' + uri));
+      return Promise.reject(new Error('Should match redirect uri: ' + uri));
     }
 
-    // Extract the query string from the url.
-    var queryString = uri.replace(/^[^\?]*|\#.*$/g, '').substr(1);
+    var queryIndex    = uri.indexOf('?');
+    var fragmentIndex = uri.indexOf('#');
 
-    // Check whether a query string is present in the uri.
-    if (!queryString) {
-      return done(new Error('Unable to process uri: ' + uri));
+    if (queryIndex === -1) {
+      return Promise.reject(new Error('Unable to process uri: ' + uri));
     }
 
-    var query = uriDecode(queryString);
+    var endIndex = fragmentIndex === -1 ? uri.length : fragmentIndex;
+    var data     = decodeQuery(uri.slice(queryIndex + 1, endIndex));
+    var err      = getAuthError(data);
 
-    // Check if the query string was populated with a known error.
-    if (err = getAuthError(query)) {
-      return done(err);
+    if (err) {
+      return Promise.reject(err);
     }
 
-    // Check whether the state is correct.
-    if (state && query.state !== state) {
-      return done(new Error('Invalid state:' + query.state));
+    if (state && data.state !== state) {
+      return Promise.reject(new Error('Invalid state:' + data.state));
     }
 
     // Check whether the response code is set.
-    if (!query.code) {
-      return done(new Error('Missing code, unable to request token'));
+    if (!data.code) {
+      return Promise.reject(new Error('Missing code, unable to request token'));
     }
 
     return this.client._request({
-      uri: options.accessTokenUri,
+      url: options.accessTokenUri,
       method: 'POST',
       headers: {
         'Accept':       'application/json, application/x-www-form-urlencoded',
         'Content-Type': 'application/x-www-form-urlencoded'
       },
-      body: uriEncode({
-        code:          query.code,
+      body: {
+        code:          data.code,
         grant_type:    'authorization_code',
         redirect_uri:  options.redirectUri,
         client_id:     options.clientId,
         client_secret: options.clientSecret
-      })
-    }, function (err, data) {
-      // If an error exists or the data contains an error, return `done`.
-      if (err || (err = getAuthError(data))) {
-        return done(err);
       }
-
-      return done(null, new ClientOAuth2Token(self, data));
-    });
+    })
+      .then(handleAuthResponse)
+      .then(function (data) {
+        return new ClientOAuth2Token(self, data);
+      });
   };
 
   /**

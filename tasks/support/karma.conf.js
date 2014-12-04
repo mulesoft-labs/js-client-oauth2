@@ -37,6 +37,9 @@ module.exports = function (config) {
      * @type {Array}
      */
     files: [
+      'node_modules/es6-promise/dist/es6-promise.js',
+      'test/support/globals.js',
+      'node_modules/popsicle/popsicle.js',
       'client-oauth2.js',
       'test/browser/**/*.js'
     ],
