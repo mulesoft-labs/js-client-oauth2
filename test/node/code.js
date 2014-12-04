@@ -16,10 +16,9 @@ describe('code', function () {
   describe('#getUri', function () {
     it('should return a valid uri', function () {
       expect(githubAuth.code.getUri()).to.equal(
-        'https://github.com/login/oauth/authorize?scope=notifications&' +
-        'client_id=abc&' +
+        'https://github.com/login/oauth/authorize?client_id=abc&' +
         'redirect_uri=http%3A%2F%2Fexample.com%2Fauth%2Fcallback&' +
-        'response_type=code'
+        'scope=notifications&response_type=code'
       );
     });
   });
@@ -37,17 +36,16 @@ describe('code', function () {
         });
     });
 
-    it('should request the token', function (done) {
+    it('should request the token', function () {
       var uri = 'http://example.com/auth/callback?code=fbe55d970377e0686746&' +
         'state=7076840850058943';
 
-      githubAuth.code.getToken(uri, function (err, user) {
-        expect(user).to.an.instanceOf(ClientOAuth2.Token);
-        expect(user.accessToken).to.equal(accessToken);
-        expect(user.tokenType).to.equal('bearer');
-
-        return done(err);
-      });
+      return githubAuth.code.getToken(uri)
+        .then(function (user) {
+          expect(user).to.an.instanceOf(ClientOAuth2.Token);
+          expect(user.accessToken).to.equal(accessToken);
+          expect(user.tokenType).to.equal('bearer');
+        });
     });
   });
 });

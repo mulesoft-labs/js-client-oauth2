@@ -24,7 +24,7 @@ describe('owner', function () {
       })
         .post(
           '/login/oauth/access_token',
-          'username=blakeembrey&password=hunter2&grant_type=password'
+          'scope=&username=blakeembrey&password=hunter2&grant_type=password'
         )
         .reply(200, {
           access_token: accessToken,
@@ -33,14 +33,13 @@ describe('owner', function () {
         });
     });
 
-    it('should get the token on behalf of the user', function (done) {
-      githubAuth.owner.getToken('blakeembrey', 'hunter2', function (err, user) {
-        expect(user).to.an.instanceOf(ClientOAuth2.Token);
-        expect(user.accessToken).to.equal(accessToken);
-        expect(user.tokenType).to.equal('bearer');
-
-        return done(err);
-      });
+    it('should get the token on behalf of the user', function () {
+      return githubAuth.owner.getToken('blakeembrey', 'hunter2')
+        .then(function (user) {
+          expect(user).to.an.instanceOf(ClientOAuth2.Token);
+          expect(user.accessToken).to.equal(accessToken);
+          expect(user.tokenType).to.equal('bearer');
+        });
     });
   });
 });

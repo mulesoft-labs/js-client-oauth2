@@ -14,7 +14,10 @@ gulp.task('test:browser', function (done) {
 });
 
 gulp.task('test:node', function () {
-  return gulp.src('test/node/**/*.js', { read: false })
+  return gulp.src([
+    'test/support/globals.js',
+    'test/node/**/*.js'
+  ], { read: false })
     .pipe(mocha({ reporter: 'spec' }));
 });
 

@@ -3,7 +3,9 @@
 [![NPM version][npm-image]][npm-url]
 [![Build status][travis-image]][travis-url]
 
-A no-dependencies library for executing OAuth 2.0 grant flows and user requests in node and on the browser.
+Straight-forward library for executing OAuth 2.0 grant flows and making API requests in node and on the browser.
+
+**Please note: This module uses [Popsicle](https://github.com/blakeembrey/popsicle) to make API requests. Promises must be supported or polyfilled on all target environments.**
 
 ## Installation
 
@@ -32,24 +34,25 @@ To re-create an access token instance and make requests on behalf on the user, y
 var token = githubAuth.createToken('accessToken', 'refreshToken');
 
 // Refresh the users credentials and save the updated access token.
-token.refresh(cb);
+token.refresh().then(updateToken);
 
 token.request({
   method: 'get',
-  uri: 'https://api.github.com/users'
-}, function (err, res) {
-  console.log(res); //=> { raw: [Object], body: '...', status: 200, headers: { ... } }
+  url: 'https://api.github.com/users'
 })
+  .then(function (res) {
+    console.log(res); //=> { raw: [Object], body: '...', status: 200, headers: { ... } }
+  })
 ```
 
-You can even override the request mechanism if you need a custom implementation not supported by setting `githubAuth.request = function (opts, cb) {}`. You will need to take care to ensure the custom request mechanism supports the correct input and output object though.
+You can override the request mechanism if you need a custom implementation by setting `githubAuth.request = function (opts) { return new Promise(...); }`. You will need to make sure that the custom request mechanism supports the correct input and output objects.
 
 ### [Authorization Code Grant](http://tools.ietf.org/html/rfc6749#section-4.1)
 
 > The authorization code grant type is used to obtain both access tokens and refresh tokens and is optimized for confidential clients. Since this is a redirection-based flow, the client must be capable of interacting with the resource owner's user-agent (typically a web browser) and capable of receiving incoming requests (via redirection) from the authorization server.
 
 1. Redirect user to `githubAuth.code.getUri()`.
-2. Parse response uri and get token using `githubAuth.code.getToken(uri, cb)`.
+2. Parse response uri and get token using `githubAuth.code.getToken(uri)`.
 
 ```javascript
 var express = require('express');
@@ -62,21 +65,24 @@ app.get('/auth/github', function (req, res) {
 });
 
 app.get('/auth/github/callback', function (req, res) {
-  githubAuth.code.getToken(req.url, function (err, user) {
-    // Refresh the users access token.
-    user.refresh(function (err, updatedUser) {
-      console.log(updatedUser === user); //=> true
-    });
+  githubAuth.code.getToken(req.url)
+    .then(function (user) {
+      console.log(user); //=> { accessToken: '...', tokenType: 'bearer', ... }
 
-    // Sign requests on behalf of the user.
-    user.sign({
-      method: 'get',
-      uri: 'http://example.com'
-    });
+      // Refresh the current users access token.
+      user.refresh().then(function (updatedUser) {
+        console.log(updatedUser === user); //=> true
+      });
 
-    // Should store this into the database.
-    return res.send(user.accessToken);
-  });
+      // Sign API requests on behalf of the current user.
+      user.sign({
+        method: 'get',
+        url: 'http://example.com'
+      });
+
+      // We should store the token into a database.
+      return res.send(user.accessToken);
+    });
 });
 ```
 
@@ -85,20 +91,22 @@ app.get('/auth/github/callback', function (req, res) {
 >  The implicit grant type is used to obtain access tokens (it does not support the issuance of refresh tokens) and is optimized for public clients known to operate a particular redirection URI. These clients are typically implemented in a browser using a scripting language such as JavaScript.
 
 1. Redirect user to `githubAuth.token.getUri()`.
-2. Parse response uri for the access token using `githubAuth.token.getToken(uri, cb)`.
+2. Parse response uri for the access token using `githubAuth.token.getToken(uri)`.
 
 ```javascript
 window.oauth2Callback = function (uri) {
-  githubAuth.token.getToken(uri, function (err, user) {
-    // Log the instance of our users token.
-    console.log(user);
+  githubAuth.token.getToken(uri)
+    .then(function (user) {
+      console.log(user); //=> { accessToken: '...', tokenType: 'bearer', ... }
 
-    // Make a HTTP request to the github API for the user.
-    user.request({
-      method: 'get',
-      uri: 'https://api.github.com/user'
+      // Make a request to the github API for the current user.
+      user.request({
+        method: 'get',
+        url: 'https://api.github.com/user'
+      }).then(function (res) {
+        console.log(res); //=> { body: { ... }, status: 200, headers: { ... } }
+      });
     });
-  });
 };
 
 // Open the page in a new window, then redirect back to a page that calls our global `oauth2Callback` function.
@@ -109,13 +117,27 @@ window.open(githubAuth.token.getUri());
 
 > The resource owner password credentials grant type is suitable in cases where the resource owner has a trust relationship with the client, such as the device operating system or a highly privileged application.  The authorization server should take special care when enabling this grant type and only allow it when other flows are not viable.
 
-1. Make a direct request for tokens on behalf of the user using `githubAuth.owner.getToken(username, password, cb)`.
+1. Make a direct request for the access token on behalf of the user using `githubAuth.owner.getToken(username, password)`.
+
+```javascript
+githubAuth.owner.getToken('blakeembrey', 'hunter2')
+  .then(function (user) {
+    console.log(user); //=> { accessToken: '...', tokenType: 'bearer', ... }
+  });
+```
 
 ### [Client Credentials Grant](http://tools.ietf.org/html/rfc6749#section-4.4)
 
 > The client can request an access token using only its client credentials (or other supported means of authentication) when the client is requesting access to the protected resources under its control, or those of another resource owner that have been previously arranged with the authorization server (the method of which is beyond the scope of this specification).
 
-1. Get the access token directly for the application by using `githubAuth.credentials.getToken(cb)`.
+1. Get the access token for the application by using `githubAuth.credentials.getToken()`.
+
+```javascript
+githubAuth.credentials.getToken()
+  .then(function (user) {
+    console.log(user); //=> { accessToken: '...', tokenType: 'bearer', ... }
+  });
+```
 
 ## License
 

@@ -44,14 +44,13 @@ describe('credentials', function () {
       server.restore();
     });
 
-    it('should request the token', function (done) {
-      githubAuth.credentials.getToken(function (err, user) {
-        expect(user).to.an.instanceOf(ClientOAuth2.Token);
-        expect(user.accessToken).to.equal(accessToken);
-        expect(user.tokenType).to.equal('bearer');
-
-        return done(err);
-      });
+    it('should request the token', function () {
+      return githubAuth.credentials.getToken()
+        .then(function (user) {
+          expect(user).to.an.instanceOf(ClientOAuth2.Token);
+          expect(user.accessToken).to.equal(accessToken);
+          expect(user.tokenType).to.equal('bearer');
+        });
     });
   });
 });

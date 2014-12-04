@@ -1,4 +1,4 @@
-describe('user token instance', function () {
+describe('user', function () {
   var githubAuth = new ClientOAuth2({
     clientId:            'abc',
     clientSecret:        '123',
@@ -53,20 +53,19 @@ describe('user token instance', function () {
       server.restore();
     });
 
-    it('should make a request on behalf of the user', function (done) {
+    it('should make a request on behalf of the user', function () {
       return token.request({
         method: 'GET',
-        uri: 'http://api.github.com/user'
-      }, function (err, response) {
-        expect(response.raw).to.exist;
-        expect(response.status).to.equal(200);
-        expect(response.body).to.equal('{"username":"blakeembrey"}');
-        expect(response.headers).to.deep.equal({
-          'content-type': 'application/json'
+        url: 'http://api.github.com/user'
+      })
+        .then(function (res) {
+          expect(res.raw).to.exist;
+          expect(res.status).to.equal(200);
+          expect(res.body).to.deep.equal({ username: 'blakeembrey' });
+          expect(res.headers).to.deep.equal({
+            'content-type': 'application/json'
+          });
         });
-
-        return done(err);
-      });
     });
   });
 
@@ -103,14 +102,13 @@ describe('user token instance', function () {
       server.restore();
     });
 
-    it('should make a request to get a new access token', function (done) {
-      return currentToken.refresh(function (err, token) {
-        expect(token).to.an.instanceOf(ClientOAuth2.Token);
-        expect(token.accessToken).to.equal('def456token');
-        expect(token.tokenType).to.equal('bearer');
-
-        return done(err);
-      });
+    it('should make a request to get a new access token', function () {
+      return currentToken.refresh()
+        .then(function (token) {
+          expect(token).to.an.instanceOf(ClientOAuth2.Token);
+          expect(token.accessToken).to.equal('def456token');
+          expect(token.tokenType).to.equal('bearer');
+        });
     });
   });
 });
