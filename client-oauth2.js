@@ -476,7 +476,7 @@
     })
       .then(handleAuthResponse)
       .then(function (data) {
-        return new ClientOAuth2Token(self, data);
+        return new ClientOAuth2Token(self.client, data);
       });
   };
 
@@ -607,7 +607,7 @@
     })
       .then(handleAuthResponse)
       .then(function (data) {
-        return new ClientOAuth2Token(self, data);
+        return new ClientOAuth2Token(self.client, data);
       });
   };
 
@@ -698,7 +698,7 @@
     })
       .then(handleAuthResponse)
       .then(function (data) {
-        return new ClientOAuth2Token(self, data);
+        return new ClientOAuth2Token(self.client, data);
       });
   };
 
