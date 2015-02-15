@@ -139,6 +139,17 @@ githubAuth.credentials.getToken()
   });
 ```
 
+### [JWT as Authorization Grant](https://tools.ietf.org/html/draft-ietf-oauth-jwt-bearer-12#section-2.1)
+
+> A JSON Web Token (JWT) Bearer Token can be used to request an access token when a client wishes to utilize an existing trust relationship, expressed through the semantics of (and digital signature or Message Authentication Code calculated over) the JWT, without a direct user approval step at the authorization server.
+
+```javascript
+githubAuth.jwt.getToken('eyJhbGciOiJFUzI1NiJ9.eyJpc3Mi[...omitted for brevity...].J9l-ZhwP[...omitted for brevity...]')
+  .then(function (user) {
+    console.log(user); //=> { accessToken: '...', tokenType: 'bearer', ... }
+  });
+```
+
 ## License
 
 Apache 2.0

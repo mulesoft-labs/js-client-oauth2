@@ -263,6 +263,7 @@
     this.token       = new TokenFlow(this);
     this.owner       = new OwnerFlow(this);
     this.credentials = new CredentialsFlow(this);
+    this.jwt         = new JwtBearerFlow(this);
   }
 
   /**
@@ -694,6 +695,59 @@
         redirect_uri:  options.redirectUri,
         client_id:     options.clientId,
         client_secret: options.clientSecret
+      }
+    })
+      .then(handleAuthResponse)
+      .then(function (data) {
+        return new ClientOAuth2Token(self.client, data);
+      });
+  };
+
+  /**
+   * Support JSON Web Token (JWT) Bearer Token OAuth 2.0 grant.
+   *
+   * Reference: https://tools.ietf.org/html/draft-ietf-oauth-jwt-bearer-12#section-2.1
+   *
+   * @param {ClientOAuth2} client
+   */
+  function JwtBearerFlow (client) {
+    this.client = client;
+  }
+
+  /**
+   * Request an access token using a JWT token.
+   *
+   * @param  {string} token A JWT token.
+   * @param  {Object}  [options]
+   * @return {Promise}
+   */
+  JwtBearerFlow.prototype.getToken = function (token, options) {
+    var self = this;
+
+    options = assign({}, this.client.options, options);
+
+    expects(options, [
+      'accessTokenUri'
+    ]);
+
+    var headers = {
+      'Accept':        'application/json, application/x-www-form-urlencoded',
+      'Content-Type':  'application/x-www-form-urlencoded'
+    };
+
+    // Authentication of the client is optional, as described in Section 3.2.1 of OAuth 2.0 [RFC6749]
+    if (options.clientId) {
+      headers['Authorization'] = 'Basic ' + btoa(options.clientId + ':' + options.clientSecret || '');
+    }
+
+    return this.client._request({
+      url: options.accessTokenUri,
+      method: 'POST',
+      headers: headers,
+      body: {
+        scope:      sanitizeScope(options.scopes),
+        grant_type: 'urn:ietf:params:oauth:grant-type:jwt-bearer',
+        assertion: token
       }
     })
       .then(handleAuthResponse)
