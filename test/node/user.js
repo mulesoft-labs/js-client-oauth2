@@ -61,6 +61,7 @@ describe('user', function () {
 
   describe('#refresh', function () {
     var currentToken = githubAuth.createToken('token', 'refresh');
+    var originalExpires = currentToken.expires = new Date();
 
     beforeEach(function () {
       nock('https://github.com', {
@@ -74,7 +75,8 @@ describe('user', function () {
         )
         .reply(200, {
           token_type: 'bearer',
-          access_token: 'def456token'
+          access_token: 'def456token',
+          expires_in: 3000
         });
     });
 
@@ -84,6 +86,7 @@ describe('user', function () {
           expect(token).to.an.instanceOf(ClientOAuth2.Token);
           expect(token.accessToken).to.equal('def456token');
           expect(token.tokenType).to.equal('bearer');
+          expect(token.expires).to.not.equal(originalExpires);
         });
     });
   });

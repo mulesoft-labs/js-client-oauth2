@@ -419,7 +419,14 @@
         // Update stored tokens on the current instance.
         self.accessToken  = data.access_token;
         self.refreshToken = data.refresh_token;
-
+        // Set the expiration date.
+        if (data.expires_in) {
+          self.expires = new Date();
+          self.expires.setSeconds(self.expires.getSeconds() + data.expires_in);
+        }
+        else {
+          self.expires = undefined;
+        }
         return self;
       });
   };
