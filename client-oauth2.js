@@ -558,7 +558,7 @@
     }
 
     // Initalize a new token and return.
-    return Promise.resolve(new ClientOAuth2Token(this, data));
+    return Promise.resolve(new ClientOAuth2Token(this.client, data));
   };
 
   /**
