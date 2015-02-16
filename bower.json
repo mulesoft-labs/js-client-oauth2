@@ -1,0 +1,24 @@
+{
+  "name": "client-oauth2",
+  "version": "0.1.0",
+  "homepage": "https://github.com/mulesoft/js-client-oauth2",
+  "authors": [
+    "MuleSoft",
+    "Inc."
+  ],
+  "description": "Straight-forward library for executing OAuth 2.0 flows and making API requests",
+  "main": "client-oauth2.js",
+  "keywords": [
+    "oauth2",
+    "token",
+    "authentication"
+  ],
+  "license": "Apache 2.0",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}
