@@ -1,11 +1,11 @@
 /* global define */
 
 (function (root) {
-  var isBrowser = typeof window === 'object'
+  var hasRequire = typeof require === 'function'
   var hasBuffer = typeof Buffer === 'function'
   var _hasOwnProperty = Object.prototype.hasOwnProperty
   var btoa = hasBuffer ? btoaBuffer : root.btoa
-  var popsicle = isBrowser ? root.popsicle : require('popsicle')
+  var popsicle = hasRequire ? require('popsicle') : root.popsicle
 
   /**
    * Format error response types to regular strings for displaying to clients.
