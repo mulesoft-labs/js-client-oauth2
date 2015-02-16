@@ -1,5 +1,4 @@
-var path     = require('path');
-var isTravis = require('is-travis');
+var isTravis = require('is-travis')
 
 /**
  * Initialize Karma with config information.
@@ -9,11 +8,11 @@ var isTravis = require('is-travis');
 module.exports = function (config) {
   config.set({
     /**
-     * The base path that will be used to resolve files.
+     * The base path used to resolve files.
      *
      * @type {String}
      */
-    basePath: path.join(__dirname, '../..'),
+    basePath: __dirname,
 
     /**
      * Test frameworks to use.
@@ -41,7 +40,7 @@ module.exports = function (config) {
       'test/support/globals.js',
       'node_modules/popsicle/popsicle.js',
       'client-oauth2.js',
-      'test/browser/**/*.js'
+      'test/*.js'
     ],
 
     /**
@@ -95,14 +94,14 @@ module.exports = function (config) {
     autoWatch: true,
 
     /**
-     * Start these browsers automatically. Currently available:
+     * Start these browsers automatically:
      * - Chrome
      * - ChromeCanary
      * - Firefox
      * - Opera
-     * - Safari (only Mac)
+     * - Safari (Mac)
      * - PhantomJS
-     * - IE (only Windows)
+     * - IE (Windows)
      *
      * @type {Array}
      */
@@ -121,6 +120,6 @@ module.exports = function (config) {
      *
      * @type {Boolean}
      */
-    singleRun: false
-  });
-};
+    singleRun: true
+  })
+}

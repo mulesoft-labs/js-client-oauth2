@@ -4,7 +4,10 @@
   "description": "Straight-forward library for executing OAuth 2.0 flows and making API requests.",
   "main": "client-oauth2.js",
   "scripts": {
-    "test": "gulp lint && gulp test"
+    "lint": "standard",
+    "test-browser": "karma start",
+    "test-node": "mocha -R spec --bail --require test/support/globals.js",
+    "test": "npm run lint && npm run test-node && npm run test-browser"
   },
   "repository": {
     "type": "git",
@@ -22,24 +25,21 @@
   },
   "homepage": "https://github.com/mulesoft/js-client-oauth2",
   "devDependencies": {
-    "chai": "^1.9.1",
+    "chai": "^2.0.0",
     "es6-promise": "^2.0.0",
-    "gulp": "^3.8.6",
-    "gulp-jshint": "^1.8.4",
-    "gulp-mocha": "^2.0.0",
     "is-travis": "^1.0.0",
     "karma": "^0.12.23",
     "karma-chrome-launcher": "^0.1.4",
+    "karma-cli": "0.0.4",
     "karma-coverage": "^0.2.6",
     "karma-firefox-launcher": "^0.1.3",
     "karma-mocha": "^0.1.9",
     "karma-phantomjs-launcher": "^0.1.4",
-    "karma-sinon-chai": "^0.2.0",
+    "karma-sinon-chai": "^0.3.0",
     "mocha": "^2.0.1",
-    "nock": "^0.51.0",
-    "require-dir": "^0.1.0"
+    "standard": "^2.6.2"
   },
   "dependencies": {
-    "popsicle": "0.0.2"
+    "popsicle": "^0.3.10"
   }
 }
