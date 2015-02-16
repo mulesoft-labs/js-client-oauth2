@@ -253,6 +253,27 @@
   }
 
   /**
+   * Create basic auth header.
+   *
+   * @param  {String} username
+   * @param  {String} password
+   * @return {String}
+   */
+  function auth (username, password) {
+    return 'Basic ' + btoa(string(username) + ':' + string(password))
+  }
+
+  /**
+   * Ensure a value is a string.
+   *
+   * @param  {String} str
+   * @return {String}
+   */
+  function string (str) {
+    return str == null ? '' : String(str)
+  }
+
+  /**
    * Construct an object that can handle the multiple OAuth 2.0 flows.
    *
    * @param {Object} options
@@ -412,15 +433,13 @@
       return Promise.reject(new Error('No refresh token set'))
     }
 
-    var authorization = btoa(options.clientId + ':' + options.clientSecret)
-
     return this.client._request({
       url: options.accessTokenUri,
       method: 'POST',
       headers: {
         'Accept': 'application/json, application/x-www-form-urlencoded',
         'Content-Type': 'application/x-www-form-urlencoded',
-        'Authorization': 'Basic ' + authorization
+        'Authorization': auth(options.clientId, options.clientSecret)
       },
       body: {
         refresh_token: this.refreshToken,
@@ -472,7 +491,6 @@
   OwnerFlow.prototype.getToken = function (username, password) {
     var self = this
     var options = this.client.options
-    var authorization = btoa(options.clientId + ':' + options.clientSecret)
 
     return this.client._request({
       url: options.accessTokenUri,
@@ -480,7 +498,7 @@
       headers: {
         'Accept': 'application/json, application/x-www-form-urlencoded',
         'Content-Type': 'application/x-www-form-urlencoded',
-        'Authorization': 'Basic ' + authorization
+        'Authorization': auth(options.clientId, options.clientSecret)
       },
       body: {
         scope: sanitizeScope(options.scopes),
@@ -604,16 +622,13 @@
       'accessTokenUri'
     ])
 
-    // Base64 encode the client id and secret for the Authorization header.
-    var authorization = btoa(options.clientId + ':' + options.clientSecret)
-
     return this.client._request({
       url: options.accessTokenUri,
       method: 'POST',
       headers: {
         'Accept': 'application/json, application/x-www-form-urlencoded',
         'Content-Type': 'application/x-www-form-urlencoded',
-        'Authorization': 'Basic ' + authorization
+        'Authorization': auth(options.clientId, options.clientSecret)
       },
       body: {
         scope: sanitizeScope(options.scopes),
@@ -751,7 +766,7 @@
 
     // Authentication of the client is optional, as described in Section 3.2.1 of OAuth 2.0 [RFC6749]
     if (options.clientId) {
-      headers['Authorization'] = 'Basic ' + btoa(options.clientId + ':' + options.clientSecret || '')
+      headers['Authorization'] = auth(options.clientId, options.clientSecret)
     }
 
     return this.client._request({
