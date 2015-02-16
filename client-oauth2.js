@@ -1,11 +1,16 @@
 /* global define */
 
-(function (root) {
-  var hasRequire = typeof require === 'function'
-  var hasBuffer = typeof Buffer === 'function'
+(function (root, factory) {
+  if (typeof define === 'function' && define.amd) {
+    define(['popsicle'], factory)
+  } else if (typeof exports === 'object') {
+    module.exports = factory(require('popsicle'))
+  } else {
+    root.ClientOAuth2 = factory(root.popsicle)
+  }
+})(this, function (popsicle) {
   var _hasOwnProperty = Object.prototype.hasOwnProperty
-  var btoa = hasBuffer ? btoaBuffer : root.btoa
-  var popsicle = hasRequire ? require('popsicle') : root.popsicle
+  var btoa = typeof Buffer === 'function' ? btoaBuffer : window.btoa
 
   /**
    * Format error response types to regular strings for displaying to clients.
@@ -785,13 +790,5 @@
       })
   }
 
-  if (typeof define === 'function' && define.amd) {
-    define([], function () {
-      return ClientOAuth2
-    })
-  } else if (typeof exports === 'object') {
-    module.exports = ClientOAuth2
-  } else {
-    root.ClientOAuth2 = ClientOAuth2
-  }
-})(this)
+  return ClientOAuth2
+})
