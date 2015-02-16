@@ -41,6 +41,7 @@
     "karma-phantomjs-launcher": "^0.1.4",
     "karma-sinon-chai": "^0.3.0",
     "mocha": "^2.0.1",
+    "pre-commit": "^1.0.4",
     "standard": "^2.6.2"
   },
   "dependencies": {
