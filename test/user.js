@@ -60,7 +60,7 @@ describe('user', function () {
     it('should be able to sign a standard request object', function () {
       var obj = user.sign({
         method: 'GET',
-        uri: 'http://api.github.com/user',
+        url: 'http://api.github.com/user',
         headers: {
           'accept': '*/*'
         }

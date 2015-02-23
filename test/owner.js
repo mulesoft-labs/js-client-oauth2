@@ -77,7 +77,7 @@ describe('owner', function () {
           .then(function (token) {
             var obj = token.sign({
               method: 'GET',
-              uri: 'http://api.github.com/user'
+              url: 'http://api.github.com/user'
             })
 
             expect(obj.headers.Authorization).to.equal('Bearer ' + accessToken)
