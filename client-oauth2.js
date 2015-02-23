@@ -398,15 +398,15 @@
     if (this.tokenType === 'bearer') {
       opts.headers.Authorization = 'Bearer ' + this.accessToken
     } else {
-      var parts = opts.uri.split('#')
+      var parts = opts.url.split('#')
       var token = 'access_token=' + this.accessToken
-      var uri = parts[0].replace(/[?&]access_token=[^&#]/, '')
+      var url = parts[0].replace(/[?&]access_token=[^&#]/, '')
       var fragment = parts[1] ? '#' + parts[1] : ''
 
-      // Prepend the correct query string parameter to the uri.
-      opts.uri = uri + (uri.indexOf('?') > -1 ? '&' : '?') + token + fragment
+      // Prepend the correct query string parameter to the url.
+      opts.url = url + (url.indexOf('?') > -1 ? '&' : '?') + token + fragment
 
-      // Attempt to avoid storing the uri in proxies, since the access token
+      // Attempt to avoid storing the url in proxies, since the access token
       // is exposed in the query parameters.
       opts.headers.Pragma = 'no-store'
       opts.headers['Cache-Control'] = 'no-store'
