@@ -329,7 +329,7 @@
   ClientOAuth2.prototype._request = function (options) {
     return this.request(options)
       .then(function (res) {
-        if (res.status < 200 || res.status >= 300) {
+        if (res.status < 200 || res.status >= 399) {
           var err = new Error('HTTP status ' + res.status)
           err.status = res.status
           err.body = res.body
