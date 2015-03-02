@@ -332,6 +332,7 @@
         if (res.status < 200 || res.status >= 300) {
           var err = new Error('HTTP status ' + res.status)
           err.status = res.status
+          err.body = res.body
           return Promise.reject(err)
         }
 
