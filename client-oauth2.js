@@ -470,7 +470,7 @@
    */
   ClientOAuth2Token.prototype.expired = function () {
     if (this.expires) {
-      return Date.now() < this.expires.getTime()
+      return Date.now() > this.expires.getTime()
     }
 
     return false
