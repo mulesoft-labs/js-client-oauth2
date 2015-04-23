@@ -105,11 +105,11 @@ describe('user', function () {
     it('should return false when token is not expired', function () {
       user.expiresIn(10)
       expect(user.expired()).to.be.equal(false)
-    });
+    })
 
     it('should return true when token is expired', function () {
       user.expiresIn(-10)
       expect(user.expired()).to.be.equal(true)
-    });
-  });
+    })
+  })
 })
