@@ -1,4 +1,4 @@
-/* global describe, it, expect, ClientOAuth2 */
+/* global describe, it, expect, ClientOAuth2, btoa */
 
 describe('user', function () {
   var accessTokenUri = 'https://github.com/login/oauth/access_token'
