@@ -1,6 +1,7 @@
 # Client OAuth 2.0
 
 [![NPM version][npm-image]][npm-url]
+[![NPM downloads][downloads-image]][downloads-url]
 [![Build status][travis-image]][travis-url]
 
 Straight-forward library for executing OAuth 2.0 grant flows and making API requests in node and on the browser.
@@ -156,5 +157,7 @@ Apache 2.0
 
 [npm-image]: https://img.shields.io/npm/v/client-oauth2.svg?style=flat
 [npm-url]: https://npmjs.org/package/client-oauth2
+[downloads-image]: https://img.shields.io/npm/dm/client-oauth2.svg?style=flat
+[downloads-url]: https://npmjs.org/package/client-oauth2
 [travis-image]: https://img.shields.io/travis/mulesoft/js-client-oauth2.svg?style=flat
 [travis-url]: https://travis-ci.org/mulesoft/js-client-oauth2
