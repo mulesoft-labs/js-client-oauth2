@@ -25,27 +25,27 @@ var githubAuth = new ClientOAuth2({
   authorizationUri: 'https://github.com/login/oauth/authorize',
   redirectUri:      'http://example.com/auth/github/callback',
   scopes:           ['notifications', 'gist']
-});
+})
 ```
 
 To re-create an access token instance and make requests on behalf on the user, you can create an access token instance by using the `createToken` method on a client instance.
 
 ```javascript
-var token = githubAuth.createToken('accessToken', 'refreshToken');
+var token = githubAuth.createToken('accessToken', 'refreshToken')
 
 // Refresh the users credentials and save the updated access token.
-token.refresh().then(updateToken);
+token.refresh().then(updateToken)
 
 token.request({
   method: 'get',
   url: 'https://api.github.com/users'
 })
   .then(function (res) {
-    console.log(res); //=> { raw: [Object], body: '...', status: 200, headers: { ... } }
+    console.log(res) //=> { raw: [Object], body: '...', status: 200, headers: { ... } }
   })
 ```
 
-You can override the request mechanism if you need a custom implementation by setting `githubAuth.request = function (opts) { return new Promise(...); }`. You will need to make sure that the custom request mechanism supports the correct input and output objects.
+You can override the request mechanism if you need a custom implementation by setting `githubAuth.request = function (opts) { return new Promise(...) }`. You will need to make sure that the custom request mechanism supports the correct input and output objects.
 
 ### [Authorization Code Grant](http://tools.ietf.org/html/rfc6749#section-4.1)
 
@@ -55,35 +55,35 @@ You can override the request mechanism if you need a custom implementation by se
 2. Parse response uri and get token using `githubAuth.code.getToken(uri)`.
 
 ```javascript
-var express = require('express');
-var app     = express();
+var express = require('express')
+var app     = express()
 
 app.get('/auth/github', function (req, res) {
-  var uri = githubAuth.code.getUri();
+  var uri = githubAuth.code.getUri()
 
-  res.redirect(uri);
-});
+  res.redirect(uri)
+})
 
 app.get('/auth/github/callback', function (req, res) {
   githubAuth.code.getToken(req.url)
     .then(function (user) {
-      console.log(user); //=> { accessToken: '...', tokenType: 'bearer', ... }
+      console.log(user) //=> { accessToken: '...', tokenType: 'bearer', ... }
 
       // Refresh the current users access token.
       user.refresh().then(function (updatedUser) {
-        console.log(updatedUser === user); //=> true
-      });
+        console.log(updatedUser === user) //=> true
+      })
 
       // Sign API requests on behalf of the current user.
       user.sign({
         method: 'get',
         url: 'http://example.com'
-      });
+      })
 
       // We should store the token into a database.
-      return res.send(user.accessToken);
-    });
-});
+      return res.send(user.accessToken)
+    })
+})
 ```
 
 ### [Implicit Grant](http://tools.ietf.org/html/rfc6749#section-4.2)
@@ -97,20 +97,20 @@ app.get('/auth/github/callback', function (req, res) {
 window.oauth2Callback = function (uri) {
   githubAuth.token.getToken(uri)
     .then(function (user) {
-      console.log(user); //=> { accessToken: '...', tokenType: 'bearer', ... }
+      console.log(user) //=> { accessToken: '...', tokenType: 'bearer', ... }
 
       // Make a request to the github API for the current user.
       user.request({
         method: 'get',
         url: 'https://api.github.com/user'
       }).then(function (res) {
-        console.log(res); //=> { body: { ... }, status: 200, headers: { ... } }
-      });
-    });
-};
+        console.log(res) //=> { body: { ... }, status: 200, headers: { ... } }
+      })
+    })
+}
 
 // Open the page in a new window, then redirect back to a page that calls our global `oauth2Callback` function.
-window.open(githubAuth.token.getUri());
+window.open(githubAuth.token.getUri())
 ```
 
 ### [Resource Owner Password Credentials Grant](http://tools.ietf.org/html/rfc6749#section-4.3)
@@ -122,8 +122,8 @@ window.open(githubAuth.token.getUri());
 ```javascript
 githubAuth.owner.getToken('blakeembrey', 'hunter2')
   .then(function (user) {
-    console.log(user); //=> { accessToken: '...', tokenType: 'bearer', ... }
-  });
+    console.log(user) //=> { accessToken: '...', tokenType: 'bearer', ... }
+  })
 ```
 
 ### [Client Credentials Grant](http://tools.ietf.org/html/rfc6749#section-4.4)
@@ -135,8 +135,8 @@ githubAuth.owner.getToken('blakeembrey', 'hunter2')
 ```javascript
 githubAuth.credentials.getToken()
   .then(function (user) {
-    console.log(user); //=> { accessToken: '...', tokenType: 'bearer', ... }
-  });
+    console.log(user) //=> { accessToken: '...', tokenType: 'bearer', ... }
+  })
 ```
 
 ### [JWT as Authorization Grant](https://tools.ietf.org/html/draft-ietf-oauth-jwt-bearer-12#section-2.1)
@@ -146,8 +146,8 @@ githubAuth.credentials.getToken()
 ```javascript
 githubAuth.jwt.getToken('eyJhbGciOiJFUzI1NiJ9.eyJpc3Mi[...omitted for brevity...].J9l-ZhwP[...omitted for brevity...]')
   .then(function (user) {
-    console.log(user); //=> { accessToken: '...', tokenType: 'bearer', ... }
-  });
+    console.log(user) //=> { accessToken: '...', tokenType: 'bearer', ... }
+  })
 ```
 
 ## License
