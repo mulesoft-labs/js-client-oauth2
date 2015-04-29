@@ -327,7 +327,7 @@
    * @return {Promise}
    */
   ClientOAuth2.prototype._request = function (options) {
-    return this.request(options)
+    return this.request(this._requestOptions(options))
       .then(function (res) {
         if (res.status < 200 || res.status >= 399) {
           var err = new Error('HTTP status ' + res.status)
@@ -338,6 +338,13 @@
 
         return res
       })
+  }
+
+  ClientOAuth2.prototype._requestOptions = function (options) {
+    return assign({
+      agent: this.options.agent,
+      rejectUnauthorized: this.options.rejectUnauthorized
+    }, options)
   }
 
   /**
@@ -423,7 +430,7 @@
    * @return {Promise}
    */
   ClientOAuth2Token.prototype.request = function (opts) {
-    return this.client.request(this.sign(opts))
+    return this.client.request(this.client._requestOptions(this.sign(opts)))
   }
 
   /**

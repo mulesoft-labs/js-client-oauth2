@@ -20,19 +20,32 @@ The module supports executing all the various OAuth 2.0 flows in any JavaScript 
 
 ```javascript
 var githubAuth = new ClientOAuth2({
-  clientId:         'abc',
-  clientSecret:     '123',
-  accessTokenUri:   'https://github.com/login/oauth/access_token',
+  clientId: 'abc',
+  clientSecret: '123',
+  accessTokenUri: 'https://github.com/login/oauth/access_token',
   authorizationUri: 'https://github.com/login/oauth/authorize',
-  redirectUri:      'http://example.com/auth/github/callback',
-  scopes:           ['notifications', 'gist']
+  authorizationGrants: ['credentials'],
+  redirectUri: 'http://example.com/auth/github/callback',
+  scopes: ['notifications', 'gist']
 })
 ```
+
+* **clientId** The client id string assigned to you by the provider
+* **clientSecret** The client secret string assigned to you by the provider
+* **accessTokenUri** The url to request the access token
+* **authorizationUri** The url to redirect users to authenticate with the provider
+* **redirectUri** A custom url for the provider to redirect users back to your application
+* **scopes** An array of scopes to authenticate against
+
+**Request specific options (node)**
+
+* **rejectUnauthorized** Reject invalid SSL certificates (default: `true`)
+* **agent** Custom HTTP pooling agent (default: `infinity-agent`)
 
 To re-create an access token instance and make requests on behalf on the user, you can create an access token instance by using the `createToken` method on a client instance.
 
 ```javascript
-var token = githubAuth.createToken('accessToken', 'refreshToken')
+var token = githubAuth.createToken('access token', 'optional refresh token', 'optional token type', { optional: 'raw user data' })
 
 // Refresh the users credentials and save the updated access token.
 token.refresh().then(updateToken)
