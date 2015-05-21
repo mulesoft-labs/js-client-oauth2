@@ -8,7 +8,8 @@ describe('token', function () {
   var refreshToken = accessToken.split('').reverse().join('')
   var refreshAccessToken = 'def456token'
   var uri = 'http://example.com/auth/callback?' +
-    'refresh_token=' + refreshToken + '#access_token=' + accessToken
+    'refresh_token=' + refreshToken + '#access_token=' + accessToken + '&' +
+    'token_type=bearer'
 
   var githubAuth = new ClientOAuth2({
     clientId: 'abc',
