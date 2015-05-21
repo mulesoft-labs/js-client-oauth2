@@ -366,7 +366,7 @@
       'state', 'error', 'error_description', 'error_uri'
     ])
 
-    this.tokenType = (data.token_type || 'bearer').toLowerCase()
+    this.tokenType = data.token_type && data.token_type.toLowerCase()
     this.accessToken = data.access_token
     this.refreshToken = data.refresh_token
 
