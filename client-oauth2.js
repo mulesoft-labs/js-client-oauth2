@@ -13,6 +13,16 @@
   var btoa = typeof Buffer === 'function' ? btoaBuffer : window.btoa
 
   /**
+   * Default headers for executing OAuth 2.0 flows.
+   *
+   * @type {Object}
+   */
+  var DEFAULT_HEADERS = {
+    'Accept': 'application/json, application/x-www-form-urlencoded',
+    'Content-Type': 'application/x-www-form-urlencoded'
+  }
+
+  /**
    * Format error response types to regular strings for displaying to clients.
    *
    * Reference: http://tools.ietf.org/html/rfc6749#section-4.1.2.1
@@ -453,11 +463,9 @@
     return this.client._request({
       url: options.accessTokenUri,
       method: 'POST',
-      headers: {
-        'Accept': 'application/json, application/x-www-form-urlencoded',
-        'Content-Type': 'application/x-www-form-urlencoded',
-        'Authorization': auth(options.clientId, options.clientSecret)
-      },
+      headers: assign({
+        Authorization: auth(options.clientId, options.clientSecret)
+      }, DEFAULT_HEADERS),
       body: {
         refresh_token: this.refreshToken,
         grant_type: 'refresh_token'
@@ -512,11 +520,9 @@
     return this.client._request({
       url: options.accessTokenUri,
       method: 'POST',
-      headers: {
-        'Accept': 'application/json, application/x-www-form-urlencoded',
-        'Content-Type': 'application/x-www-form-urlencoded',
-        'Authorization': auth(options.clientId, options.clientSecret)
-      },
+      headers: assign({
+        Authorization: auth(options.clientId, options.clientSecret)
+      }, DEFAULT_HEADERS),
       body: {
         scope: sanitizeScope(options.scopes),
         username: username,
@@ -642,11 +648,9 @@
     return this.client._request({
       url: options.accessTokenUri,
       method: 'POST',
-      headers: {
-        'Accept': 'application/json, application/x-www-form-urlencoded',
-        'Content-Type': 'application/x-www-form-urlencoded',
-        'Authorization': auth(options.clientId, options.clientSecret)
-      },
+      headers: assign({
+        Authorization: auth(options.clientId, options.clientSecret)
+      }, DEFAULT_HEADERS),
       body: {
         scope: sanitizeScope(options.scopes),
         grant_type: 'client_credentials'
@@ -731,10 +735,7 @@
     return this.client._request({
       url: options.accessTokenUri,
       method: 'POST',
-      headers: {
-        'Accept': 'application/json, application/x-www-form-urlencoded',
-        'Content-Type': 'application/x-www-form-urlencoded'
-      },
+      headers: assign({}, DEFAULT_HEADERS),
       body: {
         code: data.code,
         grant_type: 'authorization_code',
@@ -776,12 +777,10 @@
       'accessTokenUri'
     ])
 
-    var headers = {
-      'Accept': 'application/json, application/x-www-form-urlencoded',
-      'Content-Type': 'application/x-www-form-urlencoded'
-    }
+    var headers = assign({}, DEFAULT_HEADERS)
 
-    // Authentication of the client is optional, as described in Section 3.2.1 of OAuth 2.0 [RFC6749]
+    // Authentication of the client is optional, as described in
+    // Section 3.2.1 of OAuth 2.0 [RFC6749]
     if (options.clientId) {
       headers['Authorization'] = auth(options.clientId, options.clientSecret)
     }
