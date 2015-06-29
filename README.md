@@ -37,7 +37,13 @@ var githubAuth = new ClientOAuth2({
 * **redirectUri** A custom url for the provider to redirect users back to your application
 * **scopes** An array of scopes to authenticate against
 
-**Request specific options (node)**
+**Request options**
+
+* **body** An object to merge with the body of every request
+* **query** An object to merge with the query parameters of every request
+* **headers** An object to merge with the headers of every request
+
+**Request options (node only)**
 
 * **rejectUnauthorized** Reject invalid SSL certificates (default: `true`)
 * **agent** Custom HTTP pooling agent (default: `infinity-agent`)

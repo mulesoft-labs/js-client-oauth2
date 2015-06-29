@@ -344,7 +344,11 @@
     return assign({
       agent: this.options.agent,
       rejectUnauthorized: this.options.rejectUnauthorized
-    }, options)
+    }, options, {
+      body: assign({}, this.options.body, options.body),
+      query: assign({}, this.options.query, options.query),
+      headers: assign({}, this.options.headers, options.headers)
+    })
   }
 
   /**
