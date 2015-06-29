@@ -61,7 +61,7 @@ token.request({
   url: 'https://api.github.com/users'
 })
   .then(function (res) {
-    console.log(res) //=> { raw: [Object], body: '...', status: 200, headers: { ... } }
+    console.log(res) //=> { body: '...', status: 200, headers: { ... } }
   })
 ```
 
