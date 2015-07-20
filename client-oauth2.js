@@ -320,13 +320,15 @@
    * @return {Object}
    */
   ClientOAuth2.prototype.createToken = function (access, refresh, type, data) {
-    data = assign({}, data, {
-      access_token: access,
-      refresh_token: refresh,
-      token_type: type
-    })
+    var options = assign(
+      {},
+      data,
+      typeof access === 'string' ? { access_token: access } : access,
+      typeof refresh === 'string' ? { refresh_token: refresh } : refresh,
+      typeof type === 'string' ? { token_type: type } : type
+    )
 
-    return new ClientOAuth2Token(this, data)
+    return new ClientOAuth2Token(this, options)
   }
 
   /**
