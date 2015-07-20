@@ -513,9 +513,10 @@
    * @param  {String}  password
    * @return {Promise}
    */
-  OwnerFlow.prototype.getToken = function (username, password) {
+  OwnerFlow.prototype.getToken = function (username, password, options) {
     var self = this
-    var options = this.client.options
+
+    options = assign({}, this.client.options, options)
 
     return this.client._request({
       url: options.accessTokenUri,
