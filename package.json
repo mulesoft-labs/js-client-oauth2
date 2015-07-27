@@ -1,6 +1,6 @@
 {
   "name": "client-oauth2",
-  "version": "0.3.2",
+  "version": "1.0.0",
   "description": "Straight-forward library for executing OAuth 2.0 flows and making API requests.",
   "main": "client-oauth2.js",
   "files": [
