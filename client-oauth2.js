@@ -353,13 +353,11 @@
   }
 
   ClientOAuth2.prototype._requestOptions = function (options) {
-    return assign({
-      agent: this.options.agent,
-      rejectUnauthorized: this.options.rejectUnauthorized
-    }, options, {
+    return assign(options, {
       body: assign({}, this.options.body, options.body),
       query: assign({}, this.options.query, options.query),
-      headers: assign({}, this.options.headers, options.headers)
+      headers: assign({}, this.options.headers, options.headers),
+      options: assign({}, this.options.options, options.options)
     })
   }
 

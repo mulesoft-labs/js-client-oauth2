@@ -38,7 +38,6 @@ module.exports = function (config) {
     files: [
       'node_modules/es6-promise/dist/es6-promise.js',
       'test/support/globals.js',
-      'node_modules/popsicle/popsicle.js',
       'client-oauth2.js',
       'test/*.js'
     ],
@@ -120,6 +119,6 @@ module.exports = function (config) {
      *
      * @type {Boolean}
      */
-    singleRun: true
+    singleRun: false
   })
 }

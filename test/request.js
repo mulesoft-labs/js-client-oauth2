@@ -2,19 +2,20 @@
 
 describe('request', function () {
   var githubAuth = new ClientOAuth2({
-    agent: 'custom agent',
+    options: {
+      agent: 'custom agent',
+      rejectUnauthorized: true
+    },
     body: {
       foo: 'bar'
-    },
-    rejectUnauthorized: true
+    }
   })
 
   var user = githubAuth.createToken('123', 'abc', 'bearer')
 
   githubAuth.request = function (opts) {
-    expect(opts.agent).to.equal('custom agent')
     expect(opts.body).to.deep.equal({ foo: 'bar', example: 'data' })
-    expect(opts.rejectUnauthorized).to.be.true
+    expect(opts.options).to.deep.equal({ agent: 'custom agent', rejectUnauthorized: true })
 
     return Promise.resolve({})
   }
