@@ -509,6 +509,9 @@
   /**
    * Make a request on behalf of the user credentials to get an acces token.
    *
+   * Reference: http://tools.ietf.org/html/rfc6749#section-4.3.2
+   * Reference: https://tools.ietf.org/html/rfc6749#section-3.2.1
+   *
    * @param  {String}  username
    * @param  {String}  password
    * @return {Promise}
@@ -528,7 +531,9 @@
         scope: sanitizeScope(options.scopes),
         username: username,
         password: password,
-        grant_type: 'password'
+        grant_type: 'password',
+        client_id: options.clientId,
+        client_secret: options.clientSecret
       }
     })
       .then(handleAuthResponse)
