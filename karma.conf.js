@@ -19,7 +19,7 @@ module.exports = function (config) {
      *
      * @type {Array}
      */
-    frameworks: ['mocha', 'sinon-chai'],
+    frameworks: ['browserify', 'mocha', 'chai'],
 
     /**
      * Preprocess files matching a given pattern.
@@ -27,7 +27,8 @@ module.exports = function (config) {
      * @type {Object}
      */
     preprocessors: {
-      'client-oauth2.js': ['coverage']
+      'client-oauth2.js': ['coverage'],
+      'test/**/*.js': ['browserify']
     },
 
     /**
@@ -36,9 +37,7 @@ module.exports = function (config) {
      * @type {Array}
      */
     files: [
-      'node_modules/es6-promise/dist/es6-promise.js',
       'test/support/globals.js',
-      'client-oauth2.js',
       'test/*.js'
     ],
 
