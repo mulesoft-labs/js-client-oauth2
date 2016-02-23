@@ -4,9 +4,7 @@
 [![NPM downloads][downloads-image]][downloads-url]
 [![Build status][travis-image]][travis-url]
 
-Straight-forward library for executing OAuth 2.0 grant flows and making API requests in node and on the browser.
-
-**Please note: This module uses [Popsicle](https://github.com/blakeembrey/popsicle) to make API requests. Promises must be supported or polyfilled on all target environments.**
+> Straight-forward execution of OAuth 2.0 flows and authenticated API requests.
 
 ## Installation
 
@@ -19,6 +17,8 @@ npm install client-oauth2 --save
 The module supports executing all the various OAuth 2.0 flows in any JavaScript environment. To authenticate you need to create an instance of the module for your API.
 
 ```javascript
+var ClientOAuth2 = require('client-oauth2')
+
 var githubAuth = new ClientOAuth2({
   clientId: 'abc',
   clientSecret: '123',

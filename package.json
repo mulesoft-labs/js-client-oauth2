@@ -1,12 +1,15 @@
 {
   "name": "client-oauth2",
   "version": "1.0.0",
-  "description": "Straight-forward library for executing OAuth 2.0 flows and making API requests.",
+  "description": "Straight-forward execution of OAuth 2.0 flows and authenticated API requests",
   "main": "client-oauth2.js",
   "files": [
     "client-oauth2.js",
     "LICENSE"
   ],
+  "browser": {
+    "buffer": false
+  },
   "scripts": {
     "lint": "standard",
     "test-browser": "karma start --single-run",
@@ -29,28 +32,29 @@
   },
   "homepage": "https://github.com/mulesoft/js-client-oauth2",
   "devDependencies": {
+    "browserify": "^12.0.2",
     "chai": "^3.2.0",
-    "es6-promise": "^2.0.0",
+    "es6-promise": "^3.1.2",
     "is-travis": "^1.0.0",
     "karma": "^0.13.3",
+    "karma-browserify": "^5.0.2",
+    "karma-chai": "^0.1.0",
     "karma-chrome-launcher": "^0.2.0",
     "karma-cli": "^0.1.0",
-    "karma-coverage": "^0.4.2",
+    "karma-coverage": "^0.5.3",
     "karma-firefox-launcher": "^0.1.3",
     "karma-mocha": "^0.2.0",
-    "karma-phantomjs-launcher": "^0.2.0",
-    "karma-sinon-chai": "^1.0.0",
+    "karma-phantomjs-launcher": "^1.0.0",
     "mocha": "^2.0.1",
-    "phantomjs": "^1.9.17",
+    "phantomjs": "^2.1.3",
+    "phantomjs-prebuilt": "^2.1.4",
     "pre-commit": "^1.0.4",
-    "standard": "^4.5.4"
+    "standard": "^6.0.7",
+    "watchify": "^3.7.0"
   },
   "dependencies": {
-    "popsicle": "^1.0.0"
-  },
-  "standard": {
-    "ignore": [
-      "bower_components/**"
-    ]
+    "object.omit": "^2.0.0",
+    "popsicle": "^3.2.2",
+    "xtend": "^4.0.1"
   }
 }

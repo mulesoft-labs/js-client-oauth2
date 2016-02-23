@@ -1,4 +1,6 @@
-/* global describe, it, expect, ClientOAuth2 */
+/* global describe, it */
+var expect = require('chai').expect
+var ClientOAuth2 = require('../')
 
 describe('request', function () {
   var githubAuth = new ClientOAuth2({

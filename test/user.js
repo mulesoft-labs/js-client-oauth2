@@ -1,4 +1,6 @@
-/* global describe, it, expect, ClientOAuth2, btoa */
+/* global describe, it, btoa */
+var expect = require('chai').expect
+var ClientOAuth2 = require('../')
 
 describe('user', function () {
   var accessTokenUri = 'https://github.com/login/oauth/access_token'

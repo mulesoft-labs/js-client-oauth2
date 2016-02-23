@@ -1,3 +1,4 @@
+sudo: false
 language: node_js
 
 notifications:
@@ -8,3 +9,5 @@ notifications:
 node_js:
   - "0.10"
   - "0.12"
+  - "4"
+  - "stable"
