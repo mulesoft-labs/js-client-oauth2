@@ -54,7 +54,7 @@
   },
   "dependencies": {
     "object.omit": "^2.0.0",
-    "popsicle": "^3.2.2",
+    "popsicle": "^5.0.0",
     "xtend": "^4.0.1"
   }
 }
