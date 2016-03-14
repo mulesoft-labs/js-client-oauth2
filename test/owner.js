@@ -4,7 +4,6 @@ var ClientOAuth2 = require('../')
 
 describe('owner', function () {
   var accessTokenUri = 'https://github.com/login/oauth/access_token'
-  var authorizationUri = 'https://github.com/login/oauth/authorize'
 
   var accessToken = '4430eb16f4f6577c0f3a15fb6127cbf828a8e403'
   var refreshToken = accessToken.split('').reverse().join('')
@@ -14,9 +13,7 @@ describe('owner', function () {
     clientId: 'abc',
     clientSecret: '123',
     accessTokenUri: accessTokenUri,
-    authorizationUri: authorizationUri,
     authorizationGrants: ['owner'],
-    redirectUri: 'http://example.com/auth/callback',
     scope: 'notifications'
   })
 
