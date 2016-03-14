@@ -26,6 +26,7 @@ describe('user', function () {
       expect(req.headers.Authorization).to.equal('Basic ' + btoa('abc:123'))
       expect(req.body.grant_type).to.equal('refresh_token')
       expect(req.body.refresh_token).to.equal(refreshToken)
+      expect(req.body.test).to.equal(true)
 
       return Promise.resolve({
         status: 200,
@@ -93,7 +94,7 @@ describe('user', function () {
       expect(user.accessToken).to.equal(accessToken)
       expect(user.tokenType).to.equal('bearer')
 
-      return user.refresh()
+      return user.refresh({ body: { test: true } })
         .then(function (token) {
           expect(token).to.an.instanceOf(ClientOAuth2.Token)
           expect(token.accessToken).to.equal(refreshAccessToken)

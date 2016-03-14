@@ -63,6 +63,8 @@ token.request({
 
 You can override the request mechanism if you need a custom implementation by setting `githubAuth.request = function (opts) { return new Promise(...) }`. You will need to make sure that the custom request mechanism supports the correct input and output objects.
 
+**P.S.** All authorization methods accept `options` as the last argument, useful for overriding the global configuration on a per-request basis.
+
 ### [Authorization Code Grant](http://tools.ietf.org/html/rfc6749#section-4.1)
 
 > The authorization code grant type is used to obtain both access tokens and refresh tokens and is optimized for confidential clients. Since this is a redirection-based flow, the client must be capable of interacting with the resource owner's user-agent (typically a web browser) and capable of receiving incoming requests (via redirection) from the authorization server.
