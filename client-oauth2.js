@@ -2,7 +2,6 @@ var extend = require('xtend')
 var popsicle = require('popsicle')
 var parseQuery = require('querystring').parse
 var parseUrl = require('url').parse
-var omit = require('object.omit')
 
 var btoa = typeof Buffer === 'function' ? btoaBuffer : window.btoa
 
@@ -201,6 +200,18 @@ function string (str) {
 }
 
 /**
+ * Merge request options from an options object.
+ */
+function requestOptions (requestOptions, options) {
+  return extend(requestOptions, {
+    body: extend(options.body, requestOptions.body),
+    query: extend(options.query, requestOptions.query),
+    headers: extend(options.headers, requestOptions.headers),
+    options: extend(options.options, requestOptions.options)
+  })
+}
+
+/**
  * Construct an object that can handle the multiple OAuth 2.0 flows.
  *
  * @param {Object} options
@@ -246,11 +257,11 @@ ClientOAuth2.prototype.createToken = function (access, refresh, type, data) {
  * Using the built-in request method, we'll automatically attempt to parse
  * the response.
  *
- * @param  {Object}  options
+ * @param  {Object}  requestObject
  * @return {Promise}
  */
-ClientOAuth2.prototype._request = function (options) {
-  return this.request(this._requestOptions(options))
+ClientOAuth2.prototype._request = function (requestObject) {
+  return this.request(requestObject)
     .then(function (res) {
       if (res.status < 200 || res.status >= 399) {
         var err = new Error('HTTP status ' + res.status)
@@ -261,15 +272,6 @@ ClientOAuth2.prototype._request = function (options) {
 
       return res
     })
-}
-
-ClientOAuth2.prototype._requestOptions = function (options) {
-  return extend(options, {
-    body: extend(this.options.body, options.body),
-    query: extend(this.options.query, options.query),
-    headers: extend(this.options.headers, options.headers),
-    options: extend(this.options.options, options.options)
-  })
 }
 
 /**
@@ -285,12 +287,7 @@ ClientOAuth2.prototype.request = popsicle.request
  */
 function ClientOAuth2Token (client, data) {
   this.client = client
-
-  this.data = omit(data, [
-    'access_token', 'refresh_token', 'token_type', 'expires_in', 'scope',
-    'state', 'error', 'error_description', 'error_uri'
-  ])
-
+  this.data = data
   this.tokenType = data.token_type && data.token_type.toLowerCase()
   this.accessToken = data.access_token
   this.refreshToken = data.refresh_token
@@ -318,44 +315,44 @@ ClientOAuth2Token.prototype.expiresIn = function (duration) {
 /**
  * Sign a standardised request object with user authentication information.
  *
- * @param  {Object} opts
+ * @param  {Object} requestOptions
  * @return {Object}
  */
-ClientOAuth2Token.prototype.sign = function (opts) {
+ClientOAuth2Token.prototype.sign = function (requestObject) {
   if (!this.accessToken) {
     throw new Error('Unable to sign without access token')
   }
 
-  opts.headers = opts.headers || {}
+  requestObject.headers = requestObject.headers || {}
 
   if (this.tokenType === 'bearer') {
-    opts.headers.Authorization = 'Bearer ' + this.accessToken
+    requestObject.headers.Authorization = 'Bearer ' + this.accessToken
   } else {
-    var parts = opts.url.split('#')
+    var parts = requestObject.url.split('#')
     var token = 'access_token=' + this.accessToken
     var url = parts[0].replace(/[?&]access_token=[^&#]/, '')
     var fragment = parts[1] ? '#' + parts[1] : ''
 
     // Prepend the correct query string parameter to the url.
-    opts.url = url + (url.indexOf('?') > -1 ? '&' : '?') + token + fragment
+    requestObject.url = url + (url.indexOf('?') > -1 ? '&' : '?') + token + fragment
 
     // Attempt to avoid storing the url in proxies, since the access token
     // is exposed in the query parameters.
-    opts.headers.Pragma = 'no-store'
-    opts.headers['Cache-Control'] = 'no-store'
+    requestObject.headers.Pragma = 'no-store'
+    requestObject.headers['Cache-Control'] = 'no-store'
   }
 
-  return opts
+  return requestObject
 }
 
 /**
  * Make a HTTP request as the user.
  *
- * @param  {Object}  opts
+ * @param  {Object}  options
  * @return {Promise}
  */
-ClientOAuth2Token.prototype.request = function (opts) {
-  return this.client.request(this.client._requestOptions(this.sign(opts)))
+ClientOAuth2Token.prototype.request = function (options) {
+  return this.client.request(requestOptions(this.sign(options), this.client.options))
 }
 
 /**
@@ -363,15 +360,16 @@ ClientOAuth2Token.prototype.request = function (opts) {
  *
  * @return {Promise}
  */
-ClientOAuth2Token.prototype.refresh = function () {
+ClientOAuth2Token.prototype.refresh = function (options) {
   var self = this
-  var options = this.client.options
+
+  options = extend(this.client.options, options)
 
   if (!this.refreshToken) {
     return Promise.reject(new Error('No refresh token set'))
   }
 
-  return this.client._request({
+  return this.client._request(requestOptions({
     url: options.accessTokenUri,
     method: 'POST',
     headers: extend(DEFAULT_HEADERS, {
@@ -381,7 +379,7 @@ ClientOAuth2Token.prototype.refresh = function () {
       refresh_token: this.refreshToken,
       grant_type: 'refresh_token'
     }
-  })
+  }, options))
     .then(handleAuthResponse)
     .then(function (data) {
       self.accessToken = data.access_token
@@ -429,7 +427,7 @@ OwnerFlow.prototype.getToken = function (username, password, options) {
 
   options = extend(this.client.options, options)
 
-  return this.client._request({
+  return this.client._request(requestOptions({
     url: options.accessTokenUri,
     method: 'POST',
     headers: extend(DEFAULT_HEADERS, {
@@ -441,7 +439,7 @@ OwnerFlow.prototype.getToken = function (username, password, options) {
       password: password,
       grant_type: 'password'
     }
-  })
+  }, options))
     .then(handleAuthResponse)
     .then(function (data) {
       return new ClientOAuth2Token(self.client, data)
@@ -476,10 +474,11 @@ TokenFlow.prototype.getUri = function (options) {
  *
  * @param  {String}  uri
  * @param  {String}  [state]
+ * @param  {Object}  [options]
  * @return {Promise}
  */
-TokenFlow.prototype.getToken = function (uri, state) {
-  var options = this.client.options
+TokenFlow.prototype.getToken = function (uri, state, options) {
+  options = extend(this.client.options, options)
 
   // Make sure the uri matches our expected redirect uri.
   if (uri.substr(0, options.redirectUri.length) !== options.redirectUri) {
@@ -546,7 +545,7 @@ CredentialsFlow.prototype.getToken = function (options) {
     'accessTokenUri'
   ])
 
-  return this.client._request({
+  return this.client._request(requestOptions({
     url: options.accessTokenUri,
     method: 'POST',
     headers: extend(DEFAULT_HEADERS, {
@@ -556,7 +555,7 @@ CredentialsFlow.prototype.getToken = function (options) {
       scope: sanitizeScope(options.scopes),
       grant_type: 'client_credentials'
     }
-  })
+  }, options))
     .then(handleAuthResponse)
     .then(function (data) {
       return new ClientOAuth2Token(self.client, data)
@@ -591,11 +590,13 @@ CodeFlow.prototype.getUri = function (options) {
  *
  * @param  {String}  uri
  * @param  {String}  [state]
+ * @param  {Object}  [options]
  * @return {Promise}
  */
-CodeFlow.prototype.getToken = function (uri, state) {
+CodeFlow.prototype.getToken = function (uri, state, options) {
   var self = this
-  var options = this.client.options
+
+  options = extend(this.client.options, options)
 
   expects(options, [
     'clientId',
@@ -631,7 +632,7 @@ CodeFlow.prototype.getToken = function (uri, state) {
     return Promise.reject(new Error('Missing code, unable to request token'))
   }
 
-  return this.client._request({
+  return this.client._request(requestOptions({
     url: options.accessTokenUri,
     method: 'POST',
     headers: extend(DEFAULT_HEADERS),
@@ -642,7 +643,7 @@ CodeFlow.prototype.getToken = function (uri, state) {
       client_id: options.clientId,
       client_secret: options.clientSecret
     }
-  })
+  }, options))
     .then(handleAuthResponse)
     .then(function (data) {
       return new ClientOAuth2Token(self.client, data)
@@ -684,7 +685,7 @@ JwtBearerFlow.prototype.getToken = function (token, options) {
     headers['Authorization'] = auth(options.clientId, options.clientSecret)
   }
 
-  return this.client._request({
+  return this.client._request(requestOptions({
     url: options.accessTokenUri,
     method: 'POST',
     headers: headers,
@@ -693,7 +694,7 @@ JwtBearerFlow.prototype.getToken = function (token, options) {
       grant_type: 'urn:ietf:params:oauth:grant-type:jwt-bearer',
       assertion: token
     }
-  })
+  }, options))
     .then(handleAuthResponse)
     .then(function (data) {
       return new ClientOAuth2Token(self.client, data)
