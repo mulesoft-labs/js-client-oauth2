@@ -83,7 +83,9 @@ app.get('/auth/github', function (req, res) {
 })
 
 app.get('/auth/github/callback', function (req, res) {
-  githubAuth.code.getToken(req.url)
+  var fullUrl = req.protocol + "://" + req.get('host') + req.url;
+  
+  githubAuth.code.getToken(fullUrl + req.url)
     .then(function (user) {
       console.log(user) //=> { accessToken: '...', tokenType: 'bearer', ... }
 
