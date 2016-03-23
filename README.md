@@ -74,7 +74,7 @@ You can override the request mechanism if you need a custom implementation by se
 
 ```javascript
 var express = require('express')
-var app     = express()
+var app = express()
 
 app.get('/auth/github', function (req, res) {
   var uri = githubAuth.code.getUri()

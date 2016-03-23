@@ -480,17 +480,17 @@ TokenFlow.prototype.getUri = function (options) {
 TokenFlow.prototype.getToken = function (uri, state, options) {
   options = extend(this.client.options, options)
 
-  // Make sure the uri matches our expected redirect uri.
-  if (uri.substr(0, options.redirectUri.length) !== options.redirectUri) {
-    return Promise.reject(new Error('Should match redirect uri: ' + uri))
-  }
-
   var url = parseUrl(uri)
+  var expectedUrl = parseUrl(options.redirectUri)
+
+  if (url.pathname !== expectedUrl.pathname) {
+    return Promise.reject(new TypeError('Should match redirect uri: ' + uri))
+  }
 
   // If no query string or fragment exists, we won't be able to parse
   // any useful information from the uri.
   if (!url.hash && !url.search) {
-    return Promise.reject(new Error('Unable to process uri: ' + uri))
+    return Promise.reject(new TypeError('Unable to process uri: ' + uri))
   }
 
   // Extract data from both the fragment and query string. The fragment is most
@@ -510,7 +510,7 @@ TokenFlow.prototype.getToken = function (uri, state, options) {
 
   // Check whether the state matches.
   if (state != null && data.state !== state) {
-    return Promise.reject(new Error('Invalid state: ' + data.state))
+    return Promise.reject(new TypeError('Invalid state: ' + data.state))
   }
 
   // Initalize a new token and return.
@@ -605,15 +605,15 @@ CodeFlow.prototype.getToken = function (uri, state, options) {
     'accessTokenUri'
   ])
 
-  // Make sure the uri matches our expected redirect uri.
-  if (uri.substr(0, options.redirectUri.length) !== options.redirectUri) {
-    return Promise.reject(new Error('Should match redirect uri: ' + uri))
+  var url = parseUrl(uri)
+  var expectedUrl = parseUrl(options.redirectUri)
+
+  if (url.pathname !== expectedUrl.pathname) {
+    return Promise.reject(new TypeError('Should match redirect uri: ' + uri))
   }
 
-  var url = parseUrl(uri)
-
   if (!url.search) {
-    return Promise.reject(new Error('Unable to process uri: ' + uri))
+    return Promise.reject(new TypeError('Unable to process uri: ' + uri))
   }
 
   var data = parseQuery(url.query)
@@ -624,12 +624,12 @@ CodeFlow.prototype.getToken = function (uri, state, options) {
   }
 
   if (state && data.state !== state) {
-    return Promise.reject(new Error('Invalid state:' + data.state))
+    return Promise.reject(new TypeError('Invalid state:' + data.state))
   }
 
   // Check whether the response code is set.
   if (!data.code) {
-    return Promise.reject(new Error('Missing code, unable to request token'))
+    return Promise.reject(new TypeError('Missing code, unable to request token'))
   }
 
   return this.client._request(requestOptions({
