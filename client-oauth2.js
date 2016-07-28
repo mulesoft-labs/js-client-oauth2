@@ -2,7 +2,6 @@ var extend = require('xtend')
 var popsicle = require('popsicle')
 var parseQuery = require('querystring').parse
 var parseUrl = require('url').parse
-var FormData = require('form-data');
 
 var btoa = typeof Buffer === 'function' ? btoaBuffer : window.btoa
 
@@ -204,10 +203,9 @@ function string (str) {
  * Merge request options from an options object.
  */
 function requestOptions (requestOptions, options) {
-
   // Only extend body if options are provided. Needed otherwise it turns
   // a FormData object into general object (which fails to match in popsicle)
-  var body = requestOptions.body 
+  var body = requestOptions.body
   if (options.body) {
     body = extend(options.body, requestOptions.body)
   }
