@@ -17,7 +17,7 @@ describe('token', function () {
     scopes: ['notifications']
   })
 
-  githubAuth.request = function (req) {
+  githubAuth._request = function (req) {
     if (req.method === 'GET' && req.url === 'http://api.github.com/user') {
       expect(req.headers.Authorization).to.equal('Bearer ' + accessToken)
 
@@ -31,6 +31,8 @@ describe('token', function () {
         }
       })
     }
+
+    return Promise.reject(new TypeError('Not here'))
   }
 
   describe('#getUri', function () {
@@ -63,25 +65,6 @@ describe('token', function () {
             })
 
             expect(obj.headers.Authorization).to.equal('Bearer ' + accessToken)
-          })
-      })
-    })
-
-    describe('#request', function () {
-      it('should make a request on behalf of the user', function () {
-        return githubAuth.token.getToken(uri)
-          .then(function (token) {
-            return token.request({
-              method: 'GET',
-              url: 'http://api.github.com/user'
-            })
-          })
-          .then(function (res) {
-            expect(res.status).to.equal(200)
-            expect(res.body).to.deep.equal({ username: 'blakeembrey' })
-            expect(res.headers).to.deep.equal({
-              'content-type': 'application/json'
-            })
           })
       })
     })

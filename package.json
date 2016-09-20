@@ -52,7 +52,7 @@
     "watchify": "^3.7.0"
   },
   "dependencies": {
-    "popsicle": "^5.0.0",
+    "popsicle": "^8.2.0",
     "xtend": "^4.0.1"
   }
 }

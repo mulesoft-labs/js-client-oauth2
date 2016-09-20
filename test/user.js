@@ -21,7 +21,7 @@ describe('user', function () {
     scopes: 'notifications'
   })
 
-  githubAuth.request = function (req) {
+  githubAuth._request = function (req) {
     if (req.method === 'POST' && req.url === accessTokenUri) {
       expect(req.headers.Authorization).to.equal('Basic ' + btoa('abc:123'))
       expect(req.body.grant_type).to.equal('refresh_token')
@@ -34,20 +34,6 @@ describe('user', function () {
           access_token: refreshAccessToken,
           refresh_token: refreshRefreshToken,
           expires_in: 3000
-        },
-        headers: {
-          'content-type': 'application/json'
-        }
-      })
-    }
-
-    if (req.method === 'GET' && req.url === 'http://api.github.com/user') {
-      expect(req.headers.Authorization).to.equal('Bearer ' + accessToken)
-
-      return Promise.resolve({
-        status: 200,
-        body: {
-          username: 'blakeembrey'
         },
         headers: {
           'content-type': 'application/json'
@@ -70,22 +56,6 @@ describe('user', function () {
       })
 
       expect(obj.headers.Authorization).to.equal('Bearer ' + accessToken)
-    })
-  })
-
-  describe('#request', function () {
-    it('should make a request on behalf of the user', function () {
-      return user.request({
-        method: 'GET',
-        url: 'http://api.github.com/user'
-      })
-        .then(function (res) {
-          expect(res.status).to.equal(200)
-          expect(res.body).to.deep.equal({ username: 'blakeembrey' })
-          expect(res.headers).to.deep.equal({
-            'content-type': 'application/json'
-          })
-        })
     })
   })
 

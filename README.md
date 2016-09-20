@@ -56,17 +56,12 @@ var token = githubAuth.createToken('access token', 'optional refresh token', 'op
 // Refresh the users credentials and save the updated access token.
 token.refresh().then(storeNewToken)
 
-// Also using `.sign({})` to sign HTTP request objects with the correct headers/URL.
-token.request({
+// Sign a standard HTTP request object, updating URL with token or authorization headers.
+token.sign({
   method: 'get',
   url: 'https://api.github.com/users'
-})
-  .then(function (res) {
-    console.log(res) //=> { body: '...', status: 200, headers: { ... } }
-  })
+}) //=> { method, url, headers, ... }
 ```
-
-You can override the request mechanism if you need a custom implementation by setting `githubAuth.request = function (opts) { return new Promise(...) }`. You will need to make sure that the custom request mechanism supports the correct input and output objects.
 
 **P.S.** All authorization methods accept `options` as the last argument, useful for overriding the global configuration on a per-request basis.
 

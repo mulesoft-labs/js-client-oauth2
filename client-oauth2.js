@@ -254,7 +254,8 @@ ClientOAuth2.prototype.createToken = function (access, refresh, type, data) {
  * @return {Promise}
  */
 ClientOAuth2.prototype._request = function (requestObject) {
-  return this.request(requestObject)
+  return popsicle.request(requestObject)
+    .use(popsicle.plugins.parse(['json', 'urlencoded']))
     .then(function (res) {
       if (res.status < 200 || res.status >= 399) {
         var err = new Error('HTTP status ' + res.status)
@@ -266,11 +267,6 @@ ClientOAuth2.prototype._request = function (requestObject) {
       return res
     })
 }
-
-/**
- * Set `popsicle` as the default request method.
- */
-ClientOAuth2.prototype.request = popsicle.request
 
 /**
  * General purpose client token generator.
@@ -336,16 +332,6 @@ ClientOAuth2Token.prototype.sign = function (requestObject) {
   }
 
   return requestObject
-}
-
-/**
- * Make a HTTP request as the user.
- *
- * @param  {Object}  options
- * @return {Promise}
- */
-ClientOAuth2Token.prototype.request = function (options) {
-  return this.client.request(requestOptions(this.sign(options), this.client.options))
 }
 
 /**
