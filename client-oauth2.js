@@ -382,12 +382,7 @@ ClientOAuth2Token.prototype.refresh = function (options) {
   }, options))
     .then(handleAuthResponse)
     .then(function (data) {
-      self.accessToken = data.access_token
-      self.refreshToken = data.refresh_token
-
-      self.expiresIn(data.expires_in)
-
-      return self
+      return new ClientOAuth2Token(self, extend(self.data, data))
     })
 }
 
