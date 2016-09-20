@@ -52,7 +52,6 @@
     "watchify": "^3.7.0"
   },
   "dependencies": {
-    "object.omit": "^2.0.0",
     "popsicle": "^5.0.0",
     "xtend": "^4.0.1"
   }
