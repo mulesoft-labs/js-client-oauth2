@@ -386,7 +386,7 @@ ClientOAuth2Token.prototype.refresh = function (options) {
       self.refreshToken = data.refresh_token
 
       self.expiresIn(data.expires_in)
-      
+
       self.data = extend(self.data, data)
 
       return self
