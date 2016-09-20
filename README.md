@@ -88,7 +88,8 @@ app.get('/auth/github/callback', function (req, res) {
 
       // Refresh the current users access token.
       user.refresh().then(function (updatedUser) {
-        console.log(updatedUser === user) //=> true
+        console.log(updatedUser !== user) //=> true
+        console.log(updatedUser.accessToken)
       })
 
       // Sign API requests on behalf of the current user.
