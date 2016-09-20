@@ -68,7 +68,7 @@ describe('code', function () {
       expect(githubAuth.code.getUri()).to.equal(
         'https://github.com/login/oauth/authorize?client_id=abc&' +
         'redirect_uri=http%3A%2F%2Fexample.com%2Fauth%2Fcallback&' +
-        'scope=notifications&response_type=code'
+        'scope=notifications&response_type=code&state='
       )
     })
   })

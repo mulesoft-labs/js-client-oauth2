@@ -1,7 +1,7 @@
 var extend = require('xtend')
 var popsicle = require('popsicle')
-var parseQuery = require('querystring').parse
-var parseUrl = require('url').parse
+var Querystring = require('querystring')
+var Url = require('url')
 
 var btoa = typeof Buffer === 'function' ? btoaBuffer : window.btoa
 
@@ -12,8 +12,6 @@ module.exports = ClientOAuth2
 
 /**
  * Default headers for executing OAuth 2.0 flows.
- *
- * @type {Object}
  */
 var DEFAULT_HEADERS = {
   'Accept': 'application/json, application/x-www-form-urlencoded',
@@ -24,8 +22,6 @@ var DEFAULT_HEADERS = {
  * Format error response types to regular strings for displaying to clients.
  *
  * Reference: http://tools.ietf.org/html/rfc6749#section-4.1.2.1
- *
- * @type {Object}
  */
 var ERROR_RESPONSES = {
   'invalid_request': [
@@ -145,7 +141,7 @@ function handleAuthResponse (res) {
  * @return {String}
  */
 function sanitizeScope (scopes) {
-  return Array.isArray(scopes) ? scopes.join(' ') : string(scopes)
+  return Array.isArray(scopes) ? scopes.join(' ') : toString(scopes)
 }
 
 /**
@@ -163,19 +159,16 @@ function createUri (options, tokenType) {
     'authorizationUri'
   ])
 
-  var clientId = encodeURIComponent(options.clientId)
-  var redirectUri = encodeURIComponent(options.redirectUri)
-  var scopes = encodeURIComponent(sanitizeScope(options.scopes))
-  var uri = options.authorizationUri + '?client_id=' + clientId +
-    '&redirect_uri=' + redirectUri +
-    '&scope=' + scopes +
-    '&response_type=' + tokenType
-
-  if (options.state) {
-    uri += '&state=' + encodeURIComponent(options.state)
-  }
-
-  return uri
+  return options.authorizationUri + '?' + Querystring.stringify(extend(
+    options.query,
+    {
+      client_id: options.clientId,
+      redirect_uri: options.redirectUri,
+      scope: sanitizeScope(options.scopes),
+      response_type: tokenType,
+      state: options.state
+    }
+  ))
 }
 
 /**
@@ -186,7 +179,7 @@ function createUri (options, tokenType) {
  * @return {String}
  */
 function auth (username, password) {
-  return 'Basic ' + btoa(string(username) + ':' + string(password))
+  return 'Basic ' + btoa(toString(username) + ':' + toString(password))
 }
 
 /**
@@ -195,7 +188,7 @@ function auth (username, password) {
  * @param  {String} str
  * @return {String}
  */
-function string (str) {
+function toString (str) {
   return str == null ? '' : String(str)
 }
 
@@ -474,8 +467,8 @@ TokenFlow.prototype.getUri = function (options) {
 TokenFlow.prototype.getToken = function (uri, options) {
   options = extend(this.client.options, options)
 
-  var url = parseUrl(uri)
-  var expectedUrl = parseUrl(options.redirectUri)
+  var url = Url.parse(uri)
+  var expectedUrl = Url.parse(options.redirectUri)
 
   if (url.pathname !== expectedUrl.pathname) {
     return Promise.reject(new TypeError('Should match redirect uri: ' + uri))
@@ -491,8 +484,8 @@ TokenFlow.prototype.getToken = function (uri, options) {
   // important, but the query string is also used because some OAuth 2.0
   // implementations (Instagram) have a bug where state is passed via query.
   var data = extend(
-    url.query ? parseQuery(url.query) : {},
-    url.hash ? parseQuery(url.hash.substr(1)) : {}
+    url.query ? Querystring.parse(url.query) : {},
+    url.hash ? Querystring.parse(url.hash.substr(1)) : {}
   )
 
   var err = getAuthError(data)
@@ -598,8 +591,8 @@ CodeFlow.prototype.getToken = function (uri, options) {
     'accessTokenUri'
   ])
 
-  var url = parseUrl(uri)
-  var expectedUrl = parseUrl(options.redirectUri)
+  var url = Url.parse(uri)
+  var expectedUrl = Url.parse(options.redirectUri)
 
   if (url.pathname !== expectedUrl.pathname) {
     return Promise.reject(new TypeError('Should match redirect uri: ' + uri))
@@ -609,7 +602,7 @@ CodeFlow.prototype.getToken = function (uri, options) {
     return Promise.reject(new TypeError('Unable to process uri: ' + uri))
   }
 
-  var data = parseQuery(url.query)
+  var data = Querystring.parse(url.query)
   var err = getAuthError(data)
 
   if (err) {

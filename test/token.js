@@ -38,7 +38,7 @@ describe('token', function () {
       expect(githubAuth.token.getUri()).to.equal(
         'https://github.com/login/oauth/authorize?client_id=abc&' +
         'redirect_uri=http%3A%2F%2Fexample.com%2Fauth%2Fcallback&' +
-        'scope=notifications&response_type=token'
+        'scope=notifications&response_type=token&state='
       )
     })
   })
