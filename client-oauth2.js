@@ -203,8 +203,15 @@ function string (str) {
  * Merge request options from an options object.
  */
 function requestOptions (requestOptions, options) {
+  // Only extend body if options are provided. Needed otherwise it turns
+  // a FormData object into general object (which fails to match in popsicle)
+  var body = requestOptions.body
+  if (options.body) {
+    body = extend(options.body, requestOptions.body)
+  }
+
   return extend(requestOptions, {
-    body: extend(options.body, requestOptions.body),
+    body: body,
     query: extend(options.query, requestOptions.query),
     headers: extend(options.headers, requestOptions.headers),
     options: extend(options.options, requestOptions.options)
@@ -280,6 +287,11 @@ ClientOAuth2.prototype._request = function (requestObject) {
 ClientOAuth2.prototype.request = popsicle.request
 
 /**
+ * Set `form` as an exposed method for building multipart forms
+ */
+ClientOAuth2.prototype.form = popsicle.form
+
+/**
  * General purpose client token generator.
  *
  * @param {Object} client
@@ -353,6 +365,16 @@ ClientOAuth2Token.prototype.sign = function (requestObject) {
  */
 ClientOAuth2Token.prototype.request = function (options) {
   return this.client.request(requestOptions(this.sign(options), this.client.options))
+}
+
+/**
+ * Build a multipart form
+ *
+ * @data  {Object}  data
+ * @return {Object} FormData object
+ */
+ClientOAuth2Token.prototype.form = function (data) {
+  return this.client.form(data)
 }
 
 /**
