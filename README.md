@@ -30,7 +30,7 @@ var githubAuth = new ClientOAuth2({
 })
 ```
 
-**Options (can also be overriden on each method):**
+### Options (global and method-based)
 
 * **clientId** The client id string assigned to you by the provider
 * **clientSecret** The client secret string assigned to you by the provider (not required for `token`)
@@ -38,9 +38,9 @@ var githubAuth = new ClientOAuth2({
 * **authorizationUri** The url to redirect users to authenticate with the provider (only required for `token` and `code`)
 * **redirectUri** A custom url for the provider to redirect users back to your application (only required for `token` and `code`)
 * **scopes** An array of scopes to authenticate against
-* **state** Nonce sent back with the redirect when authorization is complete to verify the authorization
+* **state** Nonce sent back with the redirect when authorization is complete to verify authenticity (should be random for every request)
 
-**Request options:**
+### Request options
 
 * **body** An object to merge with the body of every request
 * **query** An object to merge with the query parameters of every request
