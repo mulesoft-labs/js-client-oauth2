@@ -45,7 +45,6 @@ var githubAuth = new ClientOAuth2({
 * **body** An object to merge with the body of every request
 * **query** An object to merge with the query parameters of every request
 * **headers** An object to merge with the headers of every request
-* **options** Transport options from [popsicle](https://github.com/blakeembrey/popsicle#handling-requests)
 
 To re-create an access token instance and make requests on behalf on the user, you can create an access token instance by using the `createToken` method on a client instance.
 

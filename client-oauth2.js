@@ -199,8 +199,7 @@ function requestOptions (requestOptions, options) {
   return extend(requestOptions, {
     body: extend(options.body, requestOptions.body),
     query: extend(options.query, requestOptions.query),
-    headers: extend(options.headers, requestOptions.headers),
-    options: extend(options.options, requestOptions.options)
+    headers: extend(options.headers, requestOptions.headers)
   })
 }
 
