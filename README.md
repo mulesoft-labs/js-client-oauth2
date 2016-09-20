@@ -36,6 +36,7 @@ var githubAuth = new ClientOAuth2({
 * **authorizationUri** The url to redirect users to authenticate with the provider (only required for `token` and `code`)
 * **redirectUri** A custom url for the provider to redirect users back to your application (only required for `token` and `code`)
 * **scopes** An array of scopes to authenticate against
+* **state** Data sent back as a parameter to the redirectUrl when the authorizationUri is done
 
 **Request options**
 
