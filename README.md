@@ -30,15 +30,17 @@ var githubAuth = new ClientOAuth2({
 })
 ```
 
+**Options (can also be overriden on each method):**
+
 * **clientId** The client id string assigned to you by the provider
 * **clientSecret** The client secret string assigned to you by the provider (not required for `token`)
 * **accessTokenUri** The url to request the access token (not required for `token`)
 * **authorizationUri** The url to redirect users to authenticate with the provider (only required for `token` and `code`)
 * **redirectUri** A custom url for the provider to redirect users back to your application (only required for `token` and `code`)
 * **scopes** An array of scopes to authenticate against
-* **state** Data sent back as a parameter to the redirectUrl when the authorizationUri is done
+* **state** Nonce sent back with the redirect when authorization is complete to verify the authorization
 
-**Request options**
+**Request options:**
 
 * **body** An object to merge with the body of every request
 * **query** An object to merge with the query parameters of every request
@@ -48,11 +50,13 @@ var githubAuth = new ClientOAuth2({
 To re-create an access token instance and make requests on behalf on the user, you can create an access token instance by using the `createToken` method on a client instance.
 
 ```javascript
-var token = githubAuth.createToken('access token', 'optional refresh token', 'optional token type', { optional: 'raw user data' })
+// Can also just pass the raw `data` object in place of an argument.
+var token = githubAuth.createToken('access token', 'optional refresh token', 'optional token type', { data: 'raw user data' })
 
 // Refresh the users credentials and save the updated access token.
 token.refresh().then(storeNewToken)
 
+// Also using `.sign({})` to sign HTTP request objects with the correct headers/URL.
 token.request({
   method: 'get',
   url: 'https://api.github.com/users'
@@ -70,8 +74,8 @@ You can override the request mechanism if you need a custom implementation by se
 
 > The authorization code grant type is used to obtain both access tokens and refresh tokens and is optimized for confidential clients. Since this is a redirection-based flow, the client must be capable of interacting with the resource owner's user-agent (typically a web browser) and capable of receiving incoming requests (via redirection) from the authorization server.
 
-1. Redirect user to `githubAuth.code.getUri()`.
-2. Parse response uri and get token using `githubAuth.code.getToken(uri)`.
+1. Redirect user to `githubAuth.code.getUri([ options ])`.
+2. Parse response uri and get token using `githubAuth.code.getToken(uri [, options ])`.
 
 ```javascript
 var express = require('express')
@@ -109,8 +113,8 @@ app.get('/auth/github/callback', function (req, res) {
 
 >  The implicit grant type is used to obtain access tokens (it does not support the issuance of refresh tokens) and is optimized for public clients known to operate a particular redirection URI. These clients are typically implemented in a browser using a scripting language such as JavaScript.
 
-1. Redirect user to `githubAuth.token.getUri()`.
-2. Parse response uri for the access token using `githubAuth.token.getToken(uri)`.
+1. Redirect user to `githubAuth.token.getUri([ options ])`.
+2. Parse response uri for the access token using `githubAuth.token.getToken(uri [, options ])`.
 
 ```javascript
 window.oauth2Callback = function (uri) {
@@ -136,7 +140,7 @@ window.open(githubAuth.token.getUri())
 
 > The resource owner password credentials grant type is suitable in cases where the resource owner has a trust relationship with the client, such as the device operating system or a highly privileged application.  The authorization server should take special care when enabling this grant type and only allow it when other flows are not viable.
 
-1. Make a direct request for the access token on behalf of the user using `githubAuth.owner.getToken(username, password)`.
+1. Make a direct request for the access token on behalf of the user using `githubAuth.owner.getToken(username, password [, options ])`.
 
 ```javascript
 githubAuth.owner.getToken('blakeembrey', 'hunter2')
@@ -149,7 +153,7 @@ githubAuth.owner.getToken('blakeembrey', 'hunter2')
 
 > The client can request an access token using only its client credentials (or other supported means of authentication) when the client is requesting access to the protected resources under its control, or those of another resource owner that have been previously arranged with the authorization server (the method of which is beyond the scope of this specification).
 
-1. Get the access token for the application by using `githubAuth.credentials.getToken()`.
+1. Get the access token for the application by using `githubAuth.credentials.getToken([ options ])`.
 
 ```javascript
 githubAuth.credentials.getToken()
@@ -161,6 +165,8 @@ githubAuth.credentials.getToken()
 ### [JWT as Authorization Grant](https://tools.ietf.org/html/draft-ietf-oauth-jwt-bearer-12#section-2.1)
 
 > A JSON Web Token (JWT) Bearer Token can be used to request an access token when a client wishes to utilize an existing trust relationship, expressed through the semantics of (and digital signature or Message Authentication Code calculated over) the JWT, without a direct user approval step at the authorization server.
+
+1. Get the access token for the application by using `githubAuth.jwt.getToken(jwt [, options ])`.
 
 ```javascript
 githubAuth.jwt.getToken('eyJhbGciOiJFUzI1NiJ9.eyJpc3Mi[...omitted for brevity...].J9l-ZhwP[...omitted for brevity...]')

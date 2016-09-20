@@ -382,7 +382,7 @@ ClientOAuth2Token.prototype.refresh = function (options) {
   }, options))
     .then(handleAuthResponse)
     .then(function (data) {
-      return new ClientOAuth2Token(self, extend(self.data, data))
+      return self.client.createToken(extend(self.data, data))
     })
 }
 
@@ -437,7 +437,7 @@ OwnerFlow.prototype.getToken = function (username, password, options) {
   }, options))
     .then(handleAuthResponse)
     .then(function (data) {
-      return new ClientOAuth2Token(self.client, data)
+      return self.client.createToken(data)
     })
 }
 
@@ -468,11 +468,10 @@ TokenFlow.prototype.getUri = function (options) {
  * Get the user access token from the uri.
  *
  * @param  {String}  uri
- * @param  {String}  [state]
  * @param  {Object}  [options]
  * @return {Promise}
  */
-TokenFlow.prototype.getToken = function (uri, state, options) {
+TokenFlow.prototype.getToken = function (uri, options) {
   options = extend(this.client.options, options)
 
   var url = parseUrl(uri)
@@ -504,12 +503,12 @@ TokenFlow.prototype.getToken = function (uri, state, options) {
   }
 
   // Check whether the state matches.
-  if (state != null && data.state !== state) {
+  if (options.state != null && data.state !== options.state) {
     return Promise.reject(new TypeError('Invalid state: ' + data.state))
   }
 
   // Initalize a new token and return.
-  return Promise.resolve(new ClientOAuth2Token(this.client, data))
+  return Promise.resolve(this.client.createToken(data))
 }
 
 /**
@@ -553,7 +552,7 @@ CredentialsFlow.prototype.getToken = function (options) {
   }, options))
     .then(handleAuthResponse)
     .then(function (data) {
-      return new ClientOAuth2Token(self.client, data)
+      return self.client.createToken(data)
     })
 }
 
@@ -584,11 +583,10 @@ CodeFlow.prototype.getUri = function (options) {
  * the user access token.
  *
  * @param  {String}  uri
- * @param  {String}  [state]
  * @param  {Object}  [options]
  * @return {Promise}
  */
-CodeFlow.prototype.getToken = function (uri, state, options) {
+CodeFlow.prototype.getToken = function (uri, options) {
   var self = this
 
   options = extend(this.client.options, options)
@@ -618,7 +616,7 @@ CodeFlow.prototype.getToken = function (uri, state, options) {
     return Promise.reject(err)
   }
 
-  if (state && data.state !== state) {
+  if (options.state && data.state !== options.state) {
     return Promise.reject(new TypeError('Invalid state:' + data.state))
   }
 
@@ -641,7 +639,7 @@ CodeFlow.prototype.getToken = function (uri, state, options) {
   }, options))
     .then(handleAuthResponse)
     .then(function (data) {
-      return new ClientOAuth2Token(self.client, data)
+      return self.client.createToken(data)
     })
 }
 
@@ -692,6 +690,6 @@ JwtBearerFlow.prototype.getToken = function (token, options) {
   }, options))
     .then(handleAuthResponse)
     .then(function (data) {
-      return new ClientOAuth2Token(self.client, data)
+      return self.client.createToken(data)
     })
 }
