@@ -4,8 +4,7 @@ var config = require('./support/config')
 var ClientOAuth2 = require('../')
 
 describe('code', function () {
-  var uri = 'http://example.com/auth/callback?code=' + config.code + '&' +
-    'state=' + config.state
+  var uri = '/auth/callback?code=' + config.code + '&state=' + config.state
 
   var githubAuth = new ClientOAuth2({
     clientId: config.clientId,
@@ -53,7 +52,7 @@ describe('code', function () {
 
     describe('#refresh', function () {
       it('should make a request to get a new access token', function () {
-        return githubAuth.code.getToken(uri)
+        return githubAuth.code.getToken(uri, { state: config.state })
           .then(function (token) {
             return token.refresh()
           })
