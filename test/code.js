@@ -1,60 +1,26 @@
-/* global describe, it, btoa */
+/* global describe, it */
 var expect = require('chai').expect
+var config = require('./support/config')
 var ClientOAuth2 = require('../')
 
 describe('code', function () {
-  var accessTokenUri = 'https://github.com/login/oauth/access_token'
-  var authorizationUri = 'https://github.com/login/oauth/authorize'
-
-  var accessToken = '4430eb16f4f6577c0f3a15fb6127cbf828a8e403'
-  var refreshToken = accessToken.split('').reverse().join('')
-  var refreshAccessToken = 'def456token'
-  var uri = 'http://example.com/auth/callback?code=fbe55d970377e0686746&' +
-    'state=7076840850058943'
+  var uri = 'http://example.com/auth/callback?code=' + config.code + '&' +
+    'state=' + config.state
 
   var githubAuth = new ClientOAuth2({
-    clientId: 'abc',
-    clientSecret: '123',
-    accessTokenUri: accessTokenUri,
-    authorizationUri: authorizationUri,
+    clientId: config.clientId,
+    clientSecret: config.clientSecret,
+    accessTokenUri: config.accessTokenUri,
+    authorizationUri: config.authorizationUri,
     authorizationGrants: ['code'],
     redirectUri: 'http://example.com/auth/callback',
     scopes: 'notifications'
   })
 
-  githubAuth._request = function (req) {
-    if (req.method === 'POST' && req.url === accessTokenUri) {
-      var auth = req.headers.Authorization
-
-      if (auth) {
-        expect(auth).to.equal('Basic ' + btoa('abc:123'))
-        expect(req.body.grant_type).to.equal('refresh_token')
-        expect(req.body.refresh_token).to.equal(refreshToken)
-      } else {
-        expect(req.body.grant_type).to.equal('authorization_code')
-      }
-
-      return Promise.resolve({
-        status: 200,
-        body: {
-          access_token: auth ? refreshAccessToken : accessToken,
-          refresh_token: refreshToken,
-          token_type: 'bearer',
-          scope: 'notifications'
-        },
-        headers: {
-          'content-type': 'application/json'
-        }
-      })
-    }
-
-    return Promise.reject(new TypeError('Not here'))
-  }
-
   describe('#getUri', function () {
     it('should return a valid uri', function () {
       expect(githubAuth.code.getUri()).to.equal(
-        'https://github.com/login/oauth/authorize?client_id=abc&' +
+        config.authorizationUri + '?client_id=abc&' +
         'redirect_uri=http%3A%2F%2Fexample.com%2Fauth%2Fcallback&' +
         'scope=notifications&response_type=code&state='
       )
@@ -66,7 +32,7 @@ describe('code', function () {
       return githubAuth.code.getToken(uri)
         .then(function (user) {
           expect(user).to.an.instanceOf(ClientOAuth2.Token)
-          expect(user.accessToken).to.equal(accessToken)
+          expect(user.accessToken).to.equal(config.accessToken)
           expect(user.tokenType).to.equal('bearer')
         })
     })
@@ -80,7 +46,7 @@ describe('code', function () {
               url: 'http://api.github.com/user'
             })
 
-            expect(obj.headers.Authorization).to.equal('Bearer ' + accessToken)
+            expect(obj.headers.Authorization).to.equal('Bearer ' + config.accessToken)
           })
       })
     })
@@ -93,7 +59,7 @@ describe('code', function () {
           })
           .then(function (token) {
             expect(token).to.an.instanceOf(ClientOAuth2.Token)
-            expect(token.accessToken).to.equal(refreshAccessToken)
+            expect(token.accessToken).to.equal(config.refreshAccessToken)
             expect(token.tokenType).to.equal('bearer')
           })
       })

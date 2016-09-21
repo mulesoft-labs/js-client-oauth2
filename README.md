@@ -4,7 +4,7 @@
 [![NPM downloads][downloads-image]][downloads-url]
 [![Build status][travis-image]][travis-url]
 
-> Straight-forward execution of OAuth 2.0 flows and authenticated API requests.
+> Straight-forward execution of OAuth 2.0 flows and authenticated API requests. 7.58 kB in browsers, after minification and gzipping, 75% from `url` and `querystring` dependencies.
 
 ## Installation
 
@@ -30,6 +30,8 @@ var githubAuth = new ClientOAuth2({
 })
 ```
 
+**P.S.** The second argument to the constructor can inject a custom request function, and the third argument can inject a custom `Promise` implementation.
+
 ### Options (global and method-based)
 
 * **clientId** The client id string assigned to you by the provider
@@ -45,6 +47,7 @@ var githubAuth = new ClientOAuth2({
 * **body** An object to merge with the body of every request
 * **query** An object to merge with the query parameters of every request
 * **headers** An object to merge with the headers of every request
+* **transport** Change certain request transport behaviour (currently `rejectUnauthorized` and `agent`)
 
 To re-create an access token instance and make requests on behalf on the user, you can create an access token instance by using the `createToken` method on a client instance.
 

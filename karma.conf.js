@@ -32,6 +32,16 @@ module.exports = function (config) {
     },
 
     /**
+     * Transform browserify when bundling.
+     *
+     * @type {Object}
+     */
+    browserify: {
+      debug: true,
+      transform: ['envify']
+    },
+
+    /**
      * List of files and patterns to load in the browser.
      *
      * @type {Array}

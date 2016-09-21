@@ -1,7 +1,7 @@
 var extend = require('xtend')
-var popsicle = require('popsicle')
 var Querystring = require('querystring')
 var Url = require('url')
+var defaultRequest = require('./request')
 
 var btoa = typeof Buffer === 'function' ? btoaBuffer : window.btoa
 
@@ -119,11 +119,10 @@ function getAuthError (data) {
 /**
  * Handle the authentication response object.
  *
- * @param  {Object}  res
+ * @param  {Object}  data
  * @return {Promise}
  */
-function handleAuthResponse (res) {
-  var data = res.body
+function handleAuthResponse (data) {
   var err = getAuthError(data)
 
   // If the response contains an error, reject the refresh token.
@@ -199,7 +198,8 @@ function requestOptions (requestOptions, options) {
   return extend(requestOptions, {
     body: extend(options.body, requestOptions.body),
     query: extend(options.query, requestOptions.query),
-    headers: extend(options.headers, requestOptions.headers)
+    headers: extend(options.headers, requestOptions.headers),
+    transport: extend(options.transport, requestOptions.transport)
   })
 }
 
@@ -208,14 +208,20 @@ function requestOptions (requestOptions, options) {
  *
  * @param {Object} options
  */
-function ClientOAuth2 (options) {
+function ClientOAuth2 (options, request, Promise) {
   this.options = options
+  this.Promise = Promise || global.Promise
+  this.request = request || defaultRequest
 
   this.code = new CodeFlow(this)
   this.token = new TokenFlow(this)
   this.owner = new OwnerFlow(this)
   this.credentials = new CredentialsFlow(this)
   this.jwt = new JwtBearerFlow(this)
+
+  if (typeof this.Promise !== 'function') {
+    throw new TypeError('A `Promise` implementation is required for `ClientOAuth2` to work')
+  }
 }
 
 /**
@@ -249,12 +255,19 @@ ClientOAuth2.prototype.createToken = function (access, refresh, type, data) {
  * Using the built-in request method, we'll automatically attempt to parse
  * the response.
  *
- * @param  {Object}  requestObject
+ * @param  {Object}  options
  * @return {Promise}
  */
-ClientOAuth2.prototype._request = function (requestObject) {
-  return popsicle.request(requestObject)
-    .use(popsicle.plugins.parse(['json', 'urlencoded']))
+ClientOAuth2.prototype._request = function (options) {
+  var url = options.url
+  var body = Querystring.stringify(options.body)
+  var query = Querystring.stringify(options.query)
+
+  if (query) {
+    url += (url.indexOf('?') === -1 ? '?' : '&') + query
+  }
+
+  return this.request(options.method, url, body, options.headers, this.Promise)
     .then(function (res) {
       if (res.status < 200 || res.status >= 399) {
         var err = new Error('HTTP status ' + res.status)
@@ -263,7 +276,12 @@ ClientOAuth2.prototype._request = function (requestObject) {
         return Promise.reject(err)
       }
 
-      return res
+      // Attempt to parse as JSON, fall back to parsing as a query string.
+      try {
+        return JSON.parse(res.body)
+      } catch (e) {
+        return Querystring.parse(res.body)
+      }
     })
 }
 
