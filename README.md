@@ -30,7 +30,7 @@ var githubAuth = new ClientOAuth2({
 })
 ```
 
-**P.S.** The second argument to the constructor can inject a custom request function, and the third argument can inject a custom `Promise` implementation.
+**P.S.** The second argument to the constructor can inject a custom request function.
 
 ### Options (global and method-based)
 

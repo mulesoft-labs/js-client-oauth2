@@ -5,10 +5,9 @@
  * @param   {String}  url
  * @param   {String}  body
  * @param   {Object}  headers
- * @param   {Promise} Promise
  * @returns {Promise}
  */
-module.exports = function request (method, url, body, headers, Promise) {
+module.exports = function request (method, url, body, headers) {
   return new Promise(function (resolve, reject) {
     var xhr = new window.XMLHttpRequest()
 

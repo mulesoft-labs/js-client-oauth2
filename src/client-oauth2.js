@@ -208,9 +208,8 @@ function requestOptions (requestOptions, options) {
  *
  * @param {Object} options
  */
-function ClientOAuth2 (options, request, Promise) {
+function ClientOAuth2 (options, request) {
   this.options = options
-  this.Promise = Promise || global.Promise
   this.request = request || defaultRequest
 
   this.code = new CodeFlow(this)
@@ -218,10 +217,6 @@ function ClientOAuth2 (options, request, Promise) {
   this.owner = new OwnerFlow(this)
   this.credentials = new CredentialsFlow(this)
   this.jwt = new JwtBearerFlow(this)
-
-  if (typeof this.Promise !== 'function') {
-    throw new TypeError('A `Promise` implementation is required for `ClientOAuth2` to work')
-  }
 }
 
 /**
@@ -267,7 +262,7 @@ ClientOAuth2.prototype._request = function (options) {
     url += (url.indexOf('?') === -1 ? '?' : '&') + query
   }
 
-  return this.request(options.method, url, body, options.headers, this.Promise)
+  return this.request(options.method, url, body, options.headers)
     .then(function (res) {
       if (res.status < 200 || res.status >= 399) {
         var err = new Error('HTTP status ' + res.status)

@@ -17,6 +17,9 @@ app.post(
   function (req, res) {
     var grantType = req.body.grant_type
 
+    // Typically required header when parsing bodies.
+    assert.equal(typeof req.headers['content-length'], 'string')
+
     if (grantType === 'refresh_token') {
       assert.equal(req.body.refresh_token, config.refreshToken)
       assert.equal(req.headers.authorization, credentials)
