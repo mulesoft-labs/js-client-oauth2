@@ -47,7 +47,6 @@ var githubAuth = new ClientOAuth2({
 * **body** An object to merge with the body of every request
 * **query** An object to merge with the query parameters of every request
 * **headers** An object to merge with the headers of every request
-* **transport** Change certain request transport behaviour (currently `rejectUnauthorized` and `agent`)
 
 To re-create an access token instance and make requests on behalf on the user, you can create an access token instance by using the `createToken` method on a client instance.
 
