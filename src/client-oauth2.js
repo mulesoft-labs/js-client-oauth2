@@ -198,8 +198,7 @@ function requestOptions (requestOptions, options) {
   return extend(requestOptions, {
     body: extend(options.body, requestOptions.body),
     query: extend(options.query, requestOptions.query),
-    headers: extend(options.headers, requestOptions.headers),
-    transport: extend(options.transport, requestOptions.transport)
+    headers: extend(options.headers, requestOptions.headers)
   })
 }
 
@@ -316,7 +315,7 @@ ClientOAuth2Token.prototype.expiresIn = function (duration) {
 /**
  * Sign a standardised request object with user authentication information.
  *
- * @param  {Object} requestOptions
+ * @param  {Object} requestObject
  * @return {Object}
  */
 ClientOAuth2Token.prototype.sign = function (requestObject) {
