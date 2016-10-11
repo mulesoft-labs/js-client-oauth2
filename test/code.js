@@ -12,7 +12,7 @@ describe('code', function () {
     accessTokenUri: config.accessTokenUri,
     authorizationUri: config.authorizationUri,
     authorizationGrants: ['code'],
-    redirectUri: 'http://example.com/auth/callback',
+    redirectUri: config.redirectUri,
     scopes: 'notifications'
   })
 
@@ -33,6 +33,21 @@ describe('code', function () {
           expect(user).to.an.instanceOf(ClientOAuth2.Token)
           expect(user.accessToken).to.equal(config.accessToken)
           expect(user.tokenType).to.equal('bearer')
+        })
+    })
+
+    it('should reject with auth errors', function () {
+      var errored = false
+
+      return githubAuth.code.getToken(config.redirectUri + '?error=invalid_request')
+        .catch(function (err) {
+          errored = true
+
+          expect(err.code).to.equal('EAUTH')
+          expect(err.body.error).to.equal('invalid_request')
+        })
+        .then(function () {
+          expect(errored).to.be.true
         })
     })
 

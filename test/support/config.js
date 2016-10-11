@@ -1,5 +1,6 @@
 exports.accessTokenUri = 'http://localhost:' + process.env.PORT + '/login/oauth/access_token'
 exports.authorizationUri = 'http://localhost:' + process.env.PORT + '/login/oauth/authorize'
+exports.redirectUri = 'http://example.com/auth/callback'
 
 exports.accessToken = '4430eb16f4f6577c0f3a15fb6127cbf828a8e403'
 exports.refreshToken = exports.accessToken.split('').reverse().join('')

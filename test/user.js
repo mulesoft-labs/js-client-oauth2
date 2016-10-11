@@ -10,7 +10,7 @@ describe('user', function () {
     accessTokenUri: config.accessTokenUri,
     authorizationUri: config.authorizationUri,
     authorizationGrants: ['code'],
-    redirectUri: 'http://example.com/auth/callback',
+    redirectUri: config.redirectUri,
     scopes: 'notifications'
   })
 

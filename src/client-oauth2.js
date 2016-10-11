@@ -107,30 +107,17 @@ function expects (obj, props) {
  * @param  {Object} data
  * @return {String}
  */
-function getAuthError (data) {
-  var message = ERROR_RESPONSES[data.error] ||
-    data.error ||
-    data.error_message
+function getAuthError (body) {
+  var message = ERROR_RESPONSES[body.error] ||
+    body.error_description ||
+    body.error
 
-  // Return an error instance with the message if it exists.
-  return message && new Error(message)
-}
-
-/**
- * Handle the authentication response object.
- *
- * @param  {Object}  data
- * @return {Promise}
- */
-function handleAuthResponse (data) {
-  var err = getAuthError(data)
-
-  // If the response contains an error, reject the refresh token.
-  if (err) {
-    return Promise.reject(err)
+  if (message) {
+    var err = new Error(message)
+    err.body = body
+    err.code = 'EAUTH'
+    return err
   }
-
-  return Promise.resolve(data)
 }
 
 /**
@@ -277,13 +264,22 @@ ClientOAuth2.prototype._request = function (options) {
 
   return this.request(options.method, url, body, options.headers)
     .then(function (res) {
-      if (res.status < 200 || res.status >= 399) {
-        var err = new Error('HTTP status ' + res.status)
-        err.status = res.status
-        err.body = parseResponseBody(res.body)
-        return Promise.reject(err)
+      var body = parseResponseBody(res.body)
+      var authErr = getAuthError(body)
+
+      if (authErr) {
+        return Promise.reject(authErr)
       }
-      return parseResponseBody(res.body)
+
+      if (res.status < 200 || res.status >= 399) {
+        var statusErr = new Error('HTTP status ' + res.status)
+        statusErr.status = res.status
+        statusErr.body = res.body
+        statusErr.code = 'ESTATUS'
+        return Promise.reject(statusErr)
+      }
+
+      return body
     })
 }
 
@@ -378,7 +374,6 @@ ClientOAuth2Token.prototype.refresh = function (options) {
       grant_type: 'refresh_token'
     }
   }, options))
-    .then(handleAuthResponse)
     .then(function (data) {
       return self.client.createToken(extend(self.data, data))
     })
@@ -433,7 +428,6 @@ OwnerFlow.prototype.getToken = function (username, password, options) {
       grant_type: 'password'
     }
   }, options))
-    .then(handleAuthResponse)
     .then(function (data) {
       return self.client.createToken(data)
     })
@@ -548,7 +542,6 @@ CredentialsFlow.prototype.getToken = function (options) {
       grant_type: 'client_credentials'
     }
   }, options))
-    .then(handleAuthResponse)
     .then(function (data) {
       return self.client.createToken(data)
     })
@@ -635,7 +628,6 @@ CodeFlow.prototype.getToken = function (uri, options) {
       client_secret: options.clientSecret
     }
   }, options))
-    .then(handleAuthResponse)
     .then(function (data) {
       return self.client.createToken(data)
     })
@@ -686,7 +678,6 @@ JwtBearerFlow.prototype.getToken = function (token, options) {
       assertion: token
     }
   }, options))
-    .then(handleAuthResponse)
     .then(function (data) {
       return self.client.createToken(data)
     })
