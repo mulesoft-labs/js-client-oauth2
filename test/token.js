@@ -4,13 +4,13 @@ var config = require('./support/config')
 var ClientOAuth2 = require('../')
 
 describe('token', function () {
-  var uri = 'http://example.com/auth/callback#access_token=' + config.accessToken + '&token_type=bearer'
+  var uri = config.redirectUri + '#access_token=' + config.accessToken + '&token_type=bearer'
 
   var githubAuth = new ClientOAuth2({
     clientId: config.clientId,
     authorizationUri: config.authorizationUri,
     authorizationGrants: ['token'],
-    redirectUri: 'http://example.com/auth/callback',
+    redirectUri: config.redirectUri,
     scopes: ['notifications']
   })
 
