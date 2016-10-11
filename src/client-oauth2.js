@@ -134,6 +134,20 @@ function handleAuthResponse (data) {
 }
 
 /**
+ * Attempt to parse response body as JSON, fall back to parsing as a query string.
+ *
+ * @param {String} body
+ * @return {Object}
+ */
+function parseResponseBody (body) {
+  try {
+    return JSON.parse(body)
+  } catch (e) {
+    return Querystring.parse(body)
+  }
+}
+
+/**
  * Sanitize the scopes option to be a string.
  *
  * @param  {Array}  scopes
@@ -266,16 +280,10 @@ ClientOAuth2.prototype._request = function (options) {
       if (res.status < 200 || res.status >= 399) {
         var err = new Error('HTTP status ' + res.status)
         err.status = res.status
-        err.body = res.body
+        err.body = parseResponseBody(res.body)
         return Promise.reject(err)
       }
-
-      // Attempt to parse as JSON, fall back to parsing as a query string.
-      try {
-        return JSON.parse(res.body)
-      } catch (e) {
-        return Querystring.parse(res.body)
-      }
+      return parseResponseBody(res.body)
     })
 }
 
