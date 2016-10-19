@@ -296,7 +296,7 @@ function ClientOAuth2Token (client, data) {
   this.accessToken = data.access_token
   this.refreshToken = data.refresh_token
 
-  this.expiresIn(parseInt(data.expires_in))
+  this.expiresIn(data.expires_in)
 }
 
 /**
@@ -308,7 +308,7 @@ function ClientOAuth2Token (client, data) {
 ClientOAuth2Token.prototype.expiresIn = function (duration) {
   if (!isNaN(duration)) {
     this.expires = new Date()
-    this.expires.setSeconds(this.expires.getSeconds() + duration)
+    this.expires.setSeconds(this.expires.getSeconds() + Number(duration))
   } else {
     this.expires = undefined
   }
