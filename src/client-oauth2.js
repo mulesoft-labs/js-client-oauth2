@@ -243,7 +243,7 @@ ClientOAuth2.prototype.createToken = function (access, refresh, type, data) {
     typeof type === 'string' ? { token_type: type } : type
   )
 
-  return new ClientOAuth2Token(this, options)
+  return new ClientOAuth2.Token(this, options)
 }
 
 /**
@@ -296,21 +296,23 @@ function ClientOAuth2Token (client, data) {
   this.accessToken = data.access_token
   this.refreshToken = data.refresh_token
 
-  this.expiresIn(data.expires_in)
+  this.expiresIn(Number(data.expires_in))
 }
 
 /**
- * Expire after some seconds.
+ * Expire the token after some time.
  *
- * @param  {Number} duration
+ * @param  {Number|Date} duration Seconds from now to expire, or a date to expire on.
  * @return {Date}
  */
 ClientOAuth2Token.prototype.expiresIn = function (duration) {
-  if (!isNaN(duration)) {
+  if (typeof duration === 'number') {
     this.expires = new Date()
-    this.expires.setSeconds(this.expires.getSeconds() + Number(duration))
+    this.expires.setSeconds(this.expires.getSeconds() + duration)
+  } else if (duration instanceof Date) {
+    this.expires = new Date(duration.getTime())
   } else {
-    this.expires = undefined
+    throw new TypeError('Unknown duration: ' + duration)
   }
 
   return this.expires
@@ -360,7 +362,7 @@ ClientOAuth2Token.prototype.refresh = function (options) {
   options = extend(this.client.options, options)
 
   if (!this.refreshToken) {
-    return Promise.reject(new Error('No refresh token set'))
+    return Promise.reject(new Error('No refresh token'))
   }
 
   return this.client._request(requestOptions({
@@ -385,11 +387,7 @@ ClientOAuth2Token.prototype.refresh = function (options) {
  * @return {Boolean}
  */
 ClientOAuth2Token.prototype.expired = function () {
-  if (this.expires) {
-    return Date.now() > this.expires.getTime()
-  }
-
-  return false
+  return Date.now() > this.expires.getTime()
 }
 
 /**
