@@ -125,10 +125,10 @@ window.oauth2Callback = function (uri) {
       console.log(user) //=> { accessToken: '...', tokenType: 'bearer', ... }
 
       // Make a request to the github API for the current user.
-      user.request({
+      return popsicle.request(user.sign({
         method: 'get',
         url: 'https://api.github.com/user'
-      }).then(function (res) {
+      })).then(function (res) {
         console.log(res) //=> { body: { ... }, status: 200, headers: { ... } }
       })
     })
