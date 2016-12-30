@@ -76,8 +76,8 @@ var ERROR_RESPONSES = {
 /**
  * Support base64 in node like how it works in the browser.
  *
- * @param  {String} string
- * @return {String}
+ * @param  {string} string
+ * @return {string}
  */
 function btoaBuffer (string) {
   return new Buffer(string).toString('base64')
@@ -105,7 +105,7 @@ function expects (obj, props) {
  * Pull an authentication error from the response data.
  *
  * @param  {Object} data
- * @return {String}
+ * @return {string}
  */
 function getAuthError (body) {
   var message = ERROR_RESPONSES[body.error] ||
@@ -123,7 +123,7 @@ function getAuthError (body) {
 /**
  * Attempt to parse response body as JSON, fall back to parsing as a query string.
  *
- * @param {String} body
+ * @param {string} body
  * @return {Object}
  */
 function parseResponseBody (body) {
@@ -138,7 +138,7 @@ function parseResponseBody (body) {
  * Sanitize the scopes option to be a string.
  *
  * @param  {Array}  scopes
- * @return {String}
+ * @return {string}
  */
 function sanitizeScope (scopes) {
   return Array.isArray(scopes) ? scopes.join(' ') : toString(scopes)
@@ -148,8 +148,8 @@ function sanitizeScope (scopes) {
  * Create a request uri based on an options object and token type.
  *
  * @param  {Object} options
- * @param  {String} tokenType
- * @return {String}
+ * @param  {string} tokenType
+ * @return {string}
  */
 function createUri (options, tokenType) {
   // Check the required parameters are set.
@@ -174,9 +174,9 @@ function createUri (options, tokenType) {
 /**
  * Create basic auth header.
  *
- * @param  {String} username
- * @param  {String} password
- * @return {String}
+ * @param  {string} username
+ * @param  {string} password
+ * @return {string}
  */
 function auth (username, password) {
   return 'Basic ' + btoa(toString(username) + ':' + toString(password))
@@ -185,8 +185,8 @@ function auth (username, password) {
 /**
  * Ensure a value is a string.
  *
- * @param  {String} str
- * @return {String}
+ * @param  {string} str
+ * @return {string}
  */
 function toString (str) {
   return str == null ? '' : String(str)
@@ -229,9 +229,9 @@ ClientOAuth2.Token = ClientOAuth2Token
 /**
  * Create a new token from existing data.
  *
- * @param  {String} access
- * @param  {String} [refresh]
- * @param  {String} [type]
+ * @param  {string} access
+ * @param  {string} [refresh]
+ * @param  {string} [type]
  * @param  {Object} [data]
  * @return {Object}
  */
@@ -302,7 +302,7 @@ function ClientOAuth2Token (client, data) {
 /**
  * Expire the token after some time.
  *
- * @param  {Number|Date} duration Seconds from now to expire, or a date to expire on.
+ * @param  {number|Date} duration Seconds from now to expire, or a date to expire on.
  * @return {Date}
  */
 ClientOAuth2Token.prototype.expiresIn = function (duration) {
@@ -384,7 +384,7 @@ ClientOAuth2Token.prototype.refresh = function (options) {
 /**
  * Check whether the token has expired.
  *
- * @return {Boolean}
+ * @return {boolean}
  */
 ClientOAuth2Token.prototype.expired = function () {
   return Date.now() > this.expires.getTime()
@@ -404,8 +404,8 @@ function OwnerFlow (client) {
 /**
  * Make a request on behalf of the user credentials to get an acces token.
  *
- * @param  {String}  username
- * @param  {String}  password
+ * @param  {string}  username
+ * @param  {string}  password
  * @return {Promise}
  */
 OwnerFlow.prototype.getToken = function (username, password, options) {
@@ -446,7 +446,7 @@ function TokenFlow (client) {
  * Get the uri to redirect the user to for implicit authentication.
  *
  * @param  {Object} options
- * @return {String}
+ * @return {string}
  */
 TokenFlow.prototype.getUri = function (options) {
   options = extend(this.client.options, options)
@@ -457,7 +457,7 @@ TokenFlow.prototype.getUri = function (options) {
 /**
  * Get the user access token from the uri.
  *
- * @param  {String}  uri
+ * @param  {string}  uri
  * @param  {Object}  [options]
  * @return {Promise}
  */
@@ -559,7 +559,7 @@ function CodeFlow (client) {
 /**
  * Generate the uri for doing the first redirect.
  *
- * @return {String}
+ * @return {string}
  */
 CodeFlow.prototype.getUri = function (options) {
   options = extend(this.client.options, options)
@@ -571,7 +571,7 @@ CodeFlow.prototype.getUri = function (options) {
  * Get the code token from the redirected uri and make another request for
  * the user access token.
  *
- * @param  {String}  uri
+ * @param  {string}  uri
  * @param  {Object}  [options]
  * @return {Promise}
  */
@@ -645,8 +645,8 @@ function JwtBearerFlow (client) {
 /**
  * Request an access token using a JWT token.
  *
- * @param  {string} token A JWT token.
- * @param  {Object}  [options]
+ * @param  {string} token     A JWT token.
+ * @param  {Object} [options]
  * @return {Promise}
  */
 JwtBearerFlow.prototype.getToken = function (token, options) {

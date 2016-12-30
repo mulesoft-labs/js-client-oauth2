@@ -3,8 +3,10 @@
   "version": "3.2.0",
   "description": "Straight-forward execution of OAuth 2.0 flows and authenticated API requests",
   "main": "src/client-oauth2.js",
+  "typings": "index.d.ts",
   "files": [
     "src/",
+    "index.d.ts",
     "LICENSE"
   ],
   "browser": {

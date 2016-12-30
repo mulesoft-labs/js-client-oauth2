@@ -3,9 +3,9 @@ var popsicle = require('popsicle')
 /**
  * Make a request using node.
  *
- * @param   {String}  method
- * @param   {String}  url
- * @param   {String}  body
+ * @param   {string}  method
+ * @param   {string}  url
+ * @param   {string}  body
  * @param   {Object}  headers
  * @returns {Promise}
  */
