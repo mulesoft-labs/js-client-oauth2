@@ -48,6 +48,16 @@ declare namespace ClientOAuth2 {
     };
   }
 
+  export interface UrlObject {
+    hash?: string | {
+      [key: string]: string | string[];
+    };
+    query?: string | {
+      [key: string]: string | string[];
+    }
+    pathname?: string;
+  }
+
   export class Token {
     client: ClientOAuth2;
     data: Data;
@@ -65,13 +75,13 @@ declare namespace ClientOAuth2 {
   export class CodeFlow {
     constructor(client: ClientOAuth2);
     getUri(options?: Options): string;
-    getToken(uri: string, options?: Options): Promise<Token>;
+    getToken(uri: string | UrlObject, options?: Options): Promise<Token>;
   }
 
   export class TokenFlow {
     constructor(client: ClientOAuth2);
     getUri(options?: Options): string;
-    getToken(uri: string, options?: Options): Promise<Token>;
+    getToken(uri: string | UrlObject, options?: Options): Promise<Token>;
   }
 
   export class OwnerFlow {

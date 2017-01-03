@@ -457,23 +457,25 @@ TokenFlow.prototype.getUri = function (options) {
 /**
  * Get the user access token from the uri.
  *
- * @param  {string}  uri
- * @param  {Object}  [options]
+ * @param  {string|Object} uri
+ * @param  {Object}        [options]
  * @return {Promise}
  */
 TokenFlow.prototype.getToken = function (uri, options) {
   options = extend(this.client.options, options)
 
-  var url = Url.parse(uri)
+  var url = typeof uri === 'object' ? uri : Url.parse(uri, true)
   var expectedUrl = Url.parse(options.redirectUri)
 
-  if (url.pathname !== expectedUrl.pathname) {
-    return Promise.reject(new TypeError('Should match redirect uri: ' + uri))
+  if (typeof url.pathname === 'string' && url.pathname !== expectedUrl.pathname) {
+    return Promise.reject(
+      new TypeError('Redirected path should match configured path, but got: ' + url.pathname)
+    )
   }
 
   // If no query string or fragment exists, we won't be able to parse
   // any useful information from the uri.
-  if (!url.hash && !url.search) {
+  if (!url.hash && !url.query) {
     return Promise.reject(new TypeError('Unable to process uri: ' + uri))
   }
 
@@ -481,8 +483,8 @@ TokenFlow.prototype.getToken = function (uri, options) {
   // important, but the query string is also used because some OAuth 2.0
   // implementations (Instagram) have a bug where state is passed via query.
   var data = extend(
-    url.query ? Querystring.parse(url.query) : {},
-    url.hash ? Querystring.parse(url.hash.substr(1)) : {}
+    typeof url.query === 'string' ? Querystring.parse(url.query) : (url.query || {}),
+    typeof url.hash === 'string' ? Querystring.parse(url.hash.substr(1)) : (url.hash || {})
   )
 
   var err = getAuthError(data)
@@ -571,8 +573,8 @@ CodeFlow.prototype.getUri = function (options) {
  * Get the code token from the redirected uri and make another request for
  * the user access token.
  *
- * @param  {string}  uri
- * @param  {Object}  [options]
+ * @param  {string|Object} uri
+ * @param  {Object}        [options]
  * @return {Promise}
  */
 CodeFlow.prototype.getToken = function (uri, options) {
@@ -587,26 +589,28 @@ CodeFlow.prototype.getToken = function (uri, options) {
     'accessTokenUri'
   ])
 
-  var url = Url.parse(uri)
+  var url = typeof uri === 'object' ? uri : Url.parse(uri, true)
   var expectedUrl = Url.parse(options.redirectUri)
 
-  if (url.pathname !== expectedUrl.pathname) {
-    return Promise.reject(new TypeError('Should match redirect uri: ' + uri))
+  if (typeof url.pathname === 'string' && url.pathname !== expectedUrl.pathname) {
+    return Promise.reject(
+      new TypeError('Redirected path should match configured path, but got: ' + url.pathname)
+    )
   }
 
-  if (!url.search) {
+  if (!url.query) {
     return Promise.reject(new TypeError('Unable to process uri: ' + uri))
   }
 
-  var data = Querystring.parse(url.query)
+  var data = typeof url.query === 'string' ? Querystring.parse(url.query) : (url.query || {})
   var err = getAuthError(data)
 
   if (err) {
     return Promise.reject(err)
   }
 
-  if (options.state && data.state !== options.state) {
-    return Promise.reject(new TypeError('Invalid state:' + data.state))
+  if (options.state != null && data.state !== options.state) {
+    return Promise.reject(new TypeError('Invalid state: ' + data.state))
   }
 
   // Check whether the response code is set.

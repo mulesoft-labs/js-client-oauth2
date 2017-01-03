@@ -110,6 +110,8 @@ app.get('/auth/github/callback', function (req, res) {
 })
 ```
 
+**P.S.** The `getToken` URI parameter can be an object containing `pathname` and `query` properties.
+
 ### [Implicit Grant](http://tools.ietf.org/html/rfc6749#section-4.2)
 
 >  The implicit grant type is used to obtain access tokens (it does not support the issuance of refresh tokens) and is optimized for public clients known to operate a particular redirection URI. These clients are typically implemented in a browser using a scripting language such as JavaScript.
@@ -136,6 +138,8 @@ window.oauth2Callback = function (uri) {
 // Open the page in a new window, then redirect back to a page that calls our global `oauth2Callback` function.
 window.open(githubAuth.token.getUri())
 ```
+
+**P.S.** The `getToken` URI parameter can be an object containing `pathname`, `query` and `hash` properties.
 
 ### [Resource Owner Password Credentials Grant](http://tools.ietf.org/html/rfc6749#section-4.3)
 
