@@ -5,7 +5,7 @@ declare class ClientOAuth2 {
   credentials: ClientOAuth2.CredentialsFlow;
   jwt: ClientOAuth2.JwtBearerFlow;
 
-  constructor(options: ClientOAuth2.Options, request: ClientOAuth2.Request);
+  constructor(options: ClientOAuth2.Options, request?: ClientOAuth2.Request);
 
   createToken(data: ClientOAuth2.Data): ClientOAuth2.Token;
   createToken(accessToken: string, data: ClientOAuth2.Data): ClientOAuth2.Token;
@@ -24,7 +24,7 @@ declare namespace ClientOAuth2 {
     accessTokenUri?: string
     authorizationUri?: string
     redirectUri?: string
-    scopes?: string
+    scopes?: string[]
     state?: string
     body?: {
       [key: string]: string | string[];
