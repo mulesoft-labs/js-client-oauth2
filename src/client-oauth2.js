@@ -618,17 +618,25 @@ CodeFlow.prototype.getToken = function (uri, options) {
     return Promise.reject(new TypeError('Missing code, unable to request token'))
   }
 
+  // Construct the body params to be passed in requestOptions.
+  var body = {
+    code: data.code,
+    grant_type: 'authorization_code',
+    redirect_uri: options.redirectUri,
+    client_id: options.clientId
+  }
+
+  // Client authentication on a public client is possible without a
+  // client_secret, so we should check to make sure one exists first.
+  if (options.clientSecret) {
+    body.client_secret = options.clientSecret
+  }
+
   return this.client._request(requestOptions({
     url: options.accessTokenUri,
     method: 'POST',
     headers: extend(DEFAULT_HEADERS),
-    body: {
-      code: data.code,
-      grant_type: 'authorization_code',
-      redirect_uri: options.redirectUri,
-      client_id: options.clientId,
-      client_secret: options.clientSecret
-    }
+    body: body
   }, options))
     .then(function (data) {
       return self.client.createToken(data)
