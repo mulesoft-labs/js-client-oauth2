@@ -88,12 +88,12 @@ function btoaBuffer (string) {
  *
  * @throws {TypeError} If an expected property is missing.
  *
- * @param {Object} obj
- * @param {Array}  props
+ * @param {Object}    obj
+ * @param {...string} props
  */
-function expects (obj, props) {
-  for (var i = 0; i < props.length; i++) {
-    var prop = props[i]
+function expects (obj) {
+  for (var i = 1; i < arguments.length; i++) {
+    var prop = arguments[i]
 
     if (obj[prop] == null) {
       throw new TypeError('Expected "' + prop + '" to exist')
@@ -153,11 +153,7 @@ function sanitizeScope (scopes) {
  */
 function createUri (options, tokenType) {
   // Check the required parameters are set.
-  expects(options, [
-    'clientId',
-    'redirectUri',
-    'authorizationUri'
-  ])
+  expects(options, 'clientId', 'authorizationUri')
 
   return options.authorizationUri + '?' + Querystring.stringify(extend(
     options.query,
@@ -525,11 +521,7 @@ CredentialsFlow.prototype.getToken = function (options) {
 
   options = extend(this.client.options, options)
 
-  expects(options, [
-    'clientId',
-    'clientSecret',
-    'accessTokenUri'
-  ])
+  expects(options, 'clientId', 'clientSecret', 'accessTokenUri')
 
   return this.client._request(requestOptions({
     url: options.accessTokenUri,
@@ -582,17 +574,15 @@ CodeFlow.prototype.getToken = function (uri, options) {
 
   options = extend(this.client.options, options)
 
-  expects(options, [
-    'clientId',
-    'clientSecret',
-    'redirectUri',
-    'accessTokenUri'
-  ])
+  expects(options, 'clientId', 'accessTokenUri')
 
   var url = typeof uri === 'object' ? uri : Url.parse(uri, true)
-  var expectedUrl = Url.parse(options.redirectUri)
 
-  if (typeof url.pathname === 'string' && url.pathname !== expectedUrl.pathname) {
+  if (
+    typeof options.redirectUri === 'string' &&
+    typeof url.pathname === 'string' &&
+    url.pathname !== Url.parse(options.redirectUri).pathname
+  ) {
     return Promise.reject(
       new TypeError('Redirected path should match configured path, but got: ' + url.pathname)
     )
@@ -618,17 +608,23 @@ CodeFlow.prototype.getToken = function (uri, options) {
     return Promise.reject(new TypeError('Missing code, unable to request token'))
   }
 
+  var headers = extend(DEFAULT_HEADERS)
+  var body = { code: data.code, grant_type: 'authorization_code', redirect_uri: options.redirectUri }
+
+  // `client_id`: REQUIRED, if the client is not authenticating with the
+  // authorization server as described in Section 3.2.1.
+  // Reference: https://tools.ietf.org/html/rfc6749#section-3.2.1
+  if (options.clientSecret) {
+    headers.Authorization = auth(options.clientId, options.clientSecret)
+  } else {
+    body.client_id = options.clientId
+  }
+
   return this.client._request(requestOptions({
     url: options.accessTokenUri,
     method: 'POST',
-    headers: extend(DEFAULT_HEADERS),
-    body: {
-      code: data.code,
-      grant_type: 'authorization_code',
-      redirect_uri: options.redirectUri,
-      client_id: options.clientId,
-      client_secret: options.clientSecret
-    }
+    headers: headers,
+    body: body
   }, options))
     .then(function (data) {
       return self.client.createToken(data)
@@ -658,9 +654,7 @@ JwtBearerFlow.prototype.getToken = function (token, options) {
 
   options = extend(this.client.options, options)
 
-  expects(options, [
-    'accessTokenUri'
-  ])
+  expects(options, 'accessTokenUri')
 
   var headers = extend(DEFAULT_HEADERS)
 
