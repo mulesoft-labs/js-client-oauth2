@@ -32,9 +32,8 @@ app.post(
     }
 
     if (grantType === 'authorization_code') {
-      assert.equal(req.body.client_id, config.clientId)
-      assert.equal(req.body.client_secret, config.clientSecret)
       assert.equal(req.body.code, config.code)
+      assert.equal(req.headers.authorization, credentials)
     } else if (grantType === 'urn:ietf:params:oauth:grant-type:jwt-bearer') {
       assert.equal(req.body.assertion, config.jwt)
       assert.equal(req.headers.authorization, credentials)
