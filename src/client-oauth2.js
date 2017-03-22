@@ -1,4 +1,3 @@
-var extend = require('xtend')
 var Querystring = require('querystring')
 var Url = require('url')
 var defaultRequest = require('./request')
@@ -155,16 +154,13 @@ function createUri (options, tokenType) {
   // Check the required parameters are set.
   expects(options, 'clientId', 'authorizationUri')
 
-  return options.authorizationUri + '?' + Querystring.stringify(extend(
-    options.query,
-    {
-      client_id: options.clientId,
-      redirect_uri: options.redirectUri,
-      scope: sanitizeScope(options.scopes),
-      response_type: tokenType,
-      state: options.state
-    }
-  ))
+  return options.authorizationUri + '?' + Querystring.stringify(Object.assign({}, options.query, {
+    client_id: options.clientId,
+    redirect_uri: options.redirectUri,
+    scope: sanitizeScope(options.scopes),
+    response_type: tokenType,
+    state: options.state
+  }))
 }
 
 /**
@@ -195,9 +191,9 @@ function requestOptions (requestOptions, options) {
   return {
     url: requestOptions.url,
     method: requestOptions.method,
-    body: extend(requestOptions.body, options.body),
-    query: extend(requestOptions.query, options.query),
-    headers: extend(requestOptions.headers, options.headers)
+    body: Object.assign({}, requestOptions.body, options.body),
+    query: Object.assign({}, requestOptions.query, options.query),
+    headers: Object.assign({}, requestOptions.headers, options.headers)
   }
 }
 
@@ -234,7 +230,8 @@ ClientOAuth2.Token = ClientOAuth2Token
  * @return {Object}
  */
 ClientOAuth2.prototype.createToken = function (access, refresh, type, data) {
-  var options = extend(
+  var options = Object.assign(
+    {},
     data,
     typeof access === 'string' ? { access_token: access } : access,
     typeof refresh === 'string' ? { refresh_token: refresh } : refresh,
@@ -352,12 +349,12 @@ ClientOAuth2Token.prototype.sign = function (requestObject) {
 /**
  * Refresh a user access token with the supplied token.
  *
+ * @param  {Object}  opts
  * @return {Promise}
  */
-ClientOAuth2Token.prototype.refresh = function (options) {
+ClientOAuth2Token.prototype.refresh = function (opts) {
   var self = this
-
-  options = extend(this.client.options, options)
+  var options = Object.assign({}, this.client.options, opts)
 
   if (!this.refreshToken) {
     return Promise.reject(new Error('No refresh token'))
@@ -366,7 +363,7 @@ ClientOAuth2Token.prototype.refresh = function (options) {
   return this.client._request(requestOptions({
     url: options.accessTokenUri,
     method: 'POST',
-    headers: extend(DEFAULT_HEADERS, {
+    headers: Object.assign({}, DEFAULT_HEADERS, {
       Authorization: auth(options.clientId, options.clientSecret)
     }),
     body: {
@@ -375,7 +372,7 @@ ClientOAuth2Token.prototype.refresh = function (options) {
     }
   }, options))
     .then(function (data) {
-      return self.client.createToken(extend(self.data, data))
+      return self.client.createToken(Object.assign({}, self.data, data))
     })
 }
 
@@ -404,17 +401,17 @@ function OwnerFlow (client) {
  *
  * @param  {string}  username
  * @param  {string}  password
+ * @param  {Object}  [opts]
  * @return {Promise}
  */
-OwnerFlow.prototype.getToken = function (username, password, options) {
+OwnerFlow.prototype.getToken = function (username, password, opts) {
   var self = this
-
-  options = extend(this.client.options, options)
+  var options = Object.assign({}, this.client.options, opts)
 
   return this.client._request(requestOptions({
     url: options.accessTokenUri,
     method: 'POST',
-    headers: extend(DEFAULT_HEADERS, {
+    headers: Object.assign({}, DEFAULT_HEADERS, {
       Authorization: auth(options.clientId, options.clientSecret)
     }),
     body: {
@@ -443,11 +440,11 @@ function TokenFlow (client) {
 /**
  * Get the uri to redirect the user to for implicit authentication.
  *
- * @param  {Object} options
+ * @param  {Object} [opts]
  * @return {string}
  */
-TokenFlow.prototype.getUri = function (options) {
-  options = extend(this.client.options, options)
+TokenFlow.prototype.getUri = function (opts) {
+  var options = Object.assign({}, this.client.options, opts)
 
   return createUri(options, 'token')
 }
@@ -456,12 +453,11 @@ TokenFlow.prototype.getUri = function (options) {
  * Get the user access token from the uri.
  *
  * @param  {string|Object} uri
- * @param  {Object}        [options]
+ * @param  {Object}        [opts]
  * @return {Promise}
  */
-TokenFlow.prototype.getToken = function (uri, options) {
-  options = extend(this.client.options, options)
-
+TokenFlow.prototype.getToken = function (uri, opts) {
+  var options = Object.assign({}, this.client.options, opts)
   var url = typeof uri === 'object' ? uri : Url.parse(uri, true)
   var expectedUrl = Url.parse(options.redirectUri)
 
@@ -480,7 +476,8 @@ TokenFlow.prototype.getToken = function (uri, options) {
   // Extract data from both the fragment and query string. The fragment is most
   // important, but the query string is also used because some OAuth 2.0
   // implementations (Instagram) have a bug where state is passed via query.
-  var data = extend(
+  var data = Object.assign(
+    {},
     typeof url.query === 'string' ? Querystring.parse(url.query) : (url.query || {}),
     typeof url.hash === 'string' ? Querystring.parse(url.hash.substr(1)) : (url.hash || {})
   )
@@ -515,20 +512,19 @@ function CredentialsFlow (client) {
 /**
  * Request an access token using the client credentials.
  *
- * @param  {Object}  [options]
+ * @param  {Object}  [opts]
  * @return {Promise}
  */
-CredentialsFlow.prototype.getToken = function (options) {
+CredentialsFlow.prototype.getToken = function (opts) {
   var self = this
-
-  options = extend(this.client.options, options)
+  var options = Object.assign({}, this.client.options, opts)
 
   expects(options, 'clientId', 'clientSecret', 'accessTokenUri')
 
   return this.client._request(requestOptions({
     url: options.accessTokenUri,
     method: 'POST',
-    headers: extend(DEFAULT_HEADERS, {
+    headers: Object.assign({}, DEFAULT_HEADERS, {
       Authorization: auth(options.clientId, options.clientSecret)
     }),
     body: {
@@ -555,10 +551,11 @@ function CodeFlow (client) {
 /**
  * Generate the uri for doing the first redirect.
  *
+ * @param  {Object} [opts]
  * @return {string}
  */
-CodeFlow.prototype.getUri = function (options) {
-  options = extend(this.client.options, options)
+CodeFlow.prototype.getUri = function (opts) {
+  var options = Object.assign({}, this.client.options, opts)
 
   return createUri(options, 'code')
 }
@@ -568,13 +565,12 @@ CodeFlow.prototype.getUri = function (options) {
  * the user access token.
  *
  * @param  {string|Object} uri
- * @param  {Object}        [options]
+ * @param  {Object}        [opts]
  * @return {Promise}
  */
-CodeFlow.prototype.getToken = function (uri, options) {
+CodeFlow.prototype.getToken = function (uri, opts) {
   var self = this
-
-  options = extend(this.client.options, options)
+  var options = Object.assign({}, this.client.options, opts)
 
   expects(options, 'clientId', 'accessTokenUri')
 
@@ -610,7 +606,7 @@ CodeFlow.prototype.getToken = function (uri, options) {
     return Promise.reject(new TypeError('Missing code, unable to request token'))
   }
 
-  var headers = extend(DEFAULT_HEADERS)
+  var headers = Object.assign({}, DEFAULT_HEADERS)
   var body = { code: data.code, grant_type: 'authorization_code', redirect_uri: options.redirectUri }
 
   // `client_id`: REQUIRED, if the client is not authenticating with the
@@ -648,17 +644,15 @@ function JwtBearerFlow (client) {
  * Request an access token using a JWT token.
  *
  * @param  {string} token     A JWT token.
- * @param  {Object} [options]
+ * @param  {Object} [opts]
  * @return {Promise}
  */
-JwtBearerFlow.prototype.getToken = function (token, options) {
+JwtBearerFlow.prototype.getToken = function (token, opts) {
   var self = this
-
-  options = extend(this.client.options, options)
+  var options = Object.assign({}, this.client.options, opts)
+  var headers = Object.assign({}, DEFAULT_HEADERS)
 
   expects(options, 'accessTokenUri')
-
-  var headers = extend(DEFAULT_HEADERS)
 
   // Authentication of the client is optional, as described in
   // Section 3.2.1 of OAuth 2.0 [RFC6749]

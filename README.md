@@ -180,6 +180,10 @@ githubAuth.jwt.getToken('eyJhbGciOiJFUzI1NiJ9.eyJpc3Mi[...omitted for brevity...
   })
 ```
 
+## Dependencies
+
+Requires an ES5 environment with global `Promise` and `Object.assign`.
+
 ## License
 
 Apache 2.0
