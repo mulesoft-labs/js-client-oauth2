@@ -1,7 +1,6 @@
-require('es6-promise').polyfill()
+Object.assign = Object.assign || require('object-assign')
+global.Promise = global.Promise || require('es6-promise').Promise
 
-if (!global.btoa) {
-  global.btoa = function (str) {
-    return new Buffer(str).toString('base64')
-  }
+global.btoa = global.btoa || function (str) {
+  return new Buffer(str).toString('base64')
 }

@@ -47,7 +47,7 @@ describe('code', function () {
           expect(err.body.error).to.equal('invalid_request')
         })
         .then(function () {
-          expect(errored).to.be.true
+          expect(errored).to.equal(true)
         })
     })
 
