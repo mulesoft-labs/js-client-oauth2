@@ -192,11 +192,13 @@ function toString (str) {
  * Merge request options from an options object.
  */
 function requestOptions (requestOptions, options) {
-  return extend(requestOptions, {
-    body: extend(options.body, requestOptions.body),
-    query: extend(options.query, requestOptions.query),
-    headers: extend(options.headers, requestOptions.headers)
-  })
+  return {
+    url: requestOptions.url,
+    method: requestOptions.method,
+    body: extend(requestOptions.body, options.body),
+    query: extend(requestOptions.query, options.query),
+    headers: extend(requestOptions.headers, options.headers)
+  }
 }
 
 /**
