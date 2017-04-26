@@ -154,13 +154,13 @@ function createUri (options, tokenType) {
   // Check the required parameters are set.
   expects(options, 'clientId', 'authorizationUri')
 
-  return options.authorizationUri + '?' + Querystring.stringify(Object.assign({}, options.query, {
+  return options.authorizationUri + '?' + Querystring.stringify(Object.assign({
     client_id: options.clientId,
     redirect_uri: options.redirectUri,
     scope: sanitizeScope(options.scopes),
     response_type: tokenType,
     state: options.state
-  }))
+  }, options.query))
 }
 
 /**
