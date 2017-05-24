@@ -2,7 +2,7 @@ var Querystring = require('querystring')
 var Url = require('url')
 var defaultRequest = require('./request')
 
-var btoa = typeof Buffer === 'function' ? btoaBuffer : window.btoa
+var btoa = require('./btoa')
 
 /**
  * Export `ClientOAuth2` class.
@@ -70,16 +70,6 @@ var ERROR_RESPONSES = {
     'the request due to a temporary overloading or maintenance',
     'of the server.'
   ].join(' ')
-}
-
-/**
- * Support base64 in node like how it works in the browser.
- *
- * @param  {string} string
- * @return {string}
- */
-function btoaBuffer (string) {
-  return new Buffer(string).toString('base64')
 }
 
 /**

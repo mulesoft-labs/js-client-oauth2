@@ -9,6 +9,10 @@
     "index.d.ts",
     "LICENSE"
   ],
+  "react-native": {
+    "./src/btoa": "./src/btoa/react-native.js",
+    "./src/request": "./src/request/browser.js"
+  },
   "browser": {
     "buffer": false,
     "./src/request/index.js": "./src/request/browser.js"
@@ -64,6 +68,7 @@
     "watchify": "^3.7.0"
   },
   "dependencies": {
-    "popsicle": "^9.1.0"
+    "popsicle": "^9.1.0",
+    "base-64": "^0.1.0"
   }
 }
