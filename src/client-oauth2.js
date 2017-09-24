@@ -397,7 +397,7 @@ function OwnerFlow (client) {
 }
 
 /**
- * Make a request on behalf of the user credentials to get an acces token.
+ * Make a request on behalf of the user credentials to get an access token.
  *
  * @param  {string}  username
  * @param  {string}  password
