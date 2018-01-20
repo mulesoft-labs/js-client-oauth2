@@ -618,6 +618,11 @@ CodeFlow.prototype.getToken = function (uri, opts) {
     body.client_id = options.clientId
   }
 
+  if (options.includeClientSecretInBody) {
+    body.client_id = options.clientId
+    body.client_secret = options.client_secret
+  }
+
   return this.client._request(requestOptions({
     url: options.accessTokenUri,
     method: 'POST',
