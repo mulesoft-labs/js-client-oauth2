@@ -469,7 +469,7 @@ TokenFlow.prototype.getToken = function (uri, opts) {
 
   // If no query string or fragment exists, we won't be able to parse
   // any useful information from the uri.
-  if (!url.hash && !url.query) {
+  if (!url.hash && !url.search) {
     return Promise.reject(new TypeError('Unable to process uri: ' + uri))
   }
 
