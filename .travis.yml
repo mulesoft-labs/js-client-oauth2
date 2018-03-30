@@ -2,11 +2,8 @@ sudo: false
 
 language: node_js
 
-# env:
-#   - MOZ_HEADLESS=1
-
-# addons:
-#   firefox: latest
+env:
+  - MOZ_HEADLESS=1
 
 script: npm run lint && npm run test-server-open && npm run test-node && npm run test-browser
 after_script: npm run test-server-close
