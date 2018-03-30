@@ -113,7 +113,7 @@ module.exports = function (config) {
      *
      * @type {Array}
      */
-    browsers: isTravis ? ['PhantomJS'] : ['Chrome', 'Firefox', 'PhantomJS'],
+    browsers: isTravis ? ['Firefox'] : ['Chrome', 'Firefox', 'PhantomJS'],
 
     /**
      * If a browser does not capture within a given timeout, kill it.
