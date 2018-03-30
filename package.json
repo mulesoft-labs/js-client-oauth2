@@ -10,7 +10,7 @@
     "LICENSE"
   ],
   "browser": {
-    "buffer": false,
+    "safe-buffer": false,
     "./src/request/index.js": "./src/request/browser.js"
   },
   "scripts": {
