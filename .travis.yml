@@ -1,11 +1,20 @@
 sudo: false
+
 language: node_js
 
-notifications:
-  email:
-    on_success: never
-    on_failure: change
+env:
+  - MOZ_HEADLESS=1
+
+script: npm run lint && npm run test-server-open && npm run test-node && npm run test-browser
+after_script: npm run test-server-close
 
 node_js:
   - "4"
-  - "stable"
+  - "6"
+  - "8"
+  - "lts/*"
+
+cache:
+  directories:
+    - node_modules
+    - $HOME/.npm

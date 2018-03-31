@@ -1,3 +1,4 @@
+var Buffer = require('safe-buffer').Buffer
 var Querystring = require('querystring')
 var Url = require('url')
 var defaultRequest = require('./request')
