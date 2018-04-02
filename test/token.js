@@ -47,5 +47,14 @@ describe('token', function () {
           })
       })
     })
+
+    it('should fail if token not present', function (done) {
+      githubAuth.token.getToken(config.redirectUri)
+        .then(function (ignore) {
+          done(new Error('Promise should fail'))
+        }, function (reason) {
+          done() // Promise is rejected - pass
+        })
+    })
   })
 })
