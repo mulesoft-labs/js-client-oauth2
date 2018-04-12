@@ -3,7 +3,11 @@ var Querystring = require('querystring')
 var Url = require('url')
 var defaultRequest = require('./request')
 
-var btoa = typeof Buffer === 'function' ? btoaBuffer : window.btoa
+// For some reason in some cases invoking window.btoa without binding causes TypeError 'Invalid calling object' in IE and Edge
+// See for example https://github.com/tus/tus-js-client/issues/77
+// I could not reproduce it in tests, but it did fail in a production project
+// Binding fixes it
+var btoa = typeof Buffer === 'function' ? btoaBuffer : window.btoa.bind(window)
 
 /**
  * Export `ClientOAuth2` class.
