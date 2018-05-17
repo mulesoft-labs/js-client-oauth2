@@ -1,4 +1,4 @@
-var popsicle = require('popsicle')
+var popsicle = require("popsicle");
 
 /**
  * Make a request using node.
@@ -9,16 +9,19 @@ var popsicle = require('popsicle')
  * @param   {Object}  headers
  * @returns {Promise}
  */
-module.exports = function request (method, url, body, headers) {
-  return popsicle.get({
-    url: url,
-    body: body,
-    method: method,
-    headers: headers
-  }).then(function (res) {
-    return {
-      status: res.status,
-      body: res.body
-    }
-  })
-}
+module.exports = function request(method, url, body, headers) {
+  console.log(url, body, method, headers);
+  return popsicle
+    .get({
+      url: url,
+      body: body,
+      method: method,
+      headers: headers
+    })
+    .then(function(res) {
+      return {
+        status: res.status,
+        body: res.body
+      };
+    });
+};
