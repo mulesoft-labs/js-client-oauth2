@@ -1,4 +1,6 @@
 var popsicle = require('popsicle')
+var createProxy = require('popsicle-proxy-agent')
+var proxy = createProxy({})
 
 /**
  * Make a request using node.
@@ -14,7 +16,10 @@ module.exports = function request (method, url, body, headers) {
     url: url,
     body: body,
     method: method,
-    headers: headers
+    headers: headers,
+    transport: popsicle.createTransport({
+      agent: proxy(url)
+    })
   }).then(function (res) {
     return {
       status: res.status,
