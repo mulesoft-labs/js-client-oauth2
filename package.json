@@ -66,6 +66,7 @@
   },
   "dependencies": {
     "popsicle": "^9.1.0",
+    "popsicle-proxy-agent": "^3.0.0",
     "safe-buffer": "^5.1.1"
   }
 }
