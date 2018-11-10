@@ -10,15 +10,18 @@ var popsicle = require('popsicle')
  * @returns {Promise}
  */
 module.exports = function request (method, url, body, headers) {
-  return popsicle.get({
-    url: url,
+  var request = popsicle.request(url,{
     body: body,
     method: method,
     headers: headers
-  }).then(function (res) {
-    return {
-      status: res.status,
-      body: res.body
-    }
+  });
+
+  return popsicle.transport()(request).then(function (res) {
+    return res.body.text().then(function(content) {
+      return {
+        status: res.statusCode,
+        body:content
+      }
+    })
   })
 }
