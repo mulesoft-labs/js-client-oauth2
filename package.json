@@ -49,7 +49,7 @@
     "es6-promise": "^4.2.4",
     "express": "^4.14.0",
     "is-travis": "^1.0.0",
-    "karma": "^2.0.2",
+    "karma": "^3.0.0",
     "karma-browserify": "^5.0.2",
     "karma-chai": "^0.1.0",
     "karma-chrome-launcher": "^2.0.0",
@@ -65,7 +65,7 @@
     "watchify": "^3.7.0"
   },
   "dependencies": {
-    "popsicle": "^9.1.0",
+    "popsicle": "^10.0.0",
     "safe-buffer": "^5.1.1"
   }
 }

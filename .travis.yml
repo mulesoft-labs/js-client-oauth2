@@ -9,7 +9,6 @@ script: npm run lint && npm run test-server-open && npm run test-node && npm run
 after_script: npm run test-server-close
 
 node_js:
-  - "4"
   - "6"
   - "8"
   - "lts/*"
