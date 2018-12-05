@@ -7,7 +7,7 @@ var Querystring = require('querystring')
 var config = require('./config')
 var app = express()
 
-var credentials = 'Basic ' + new Buffer(config.clientId + ':' + config.clientSecret).toString('base64')
+var credentials = 'Basic ' + Buffer.from(config.clientId + ':' + config.clientSecret).toString('base64')
 
 app.options('/login/oauth/access_token', cors())
 
@@ -19,11 +19,11 @@ app.post(
     var grantType = req.body.grant_type
 
     // Typically required header when parsing bodies.
-    assert.equal(typeof req.headers['content-length'], 'string')
+    assert.strictEqual(typeof req.headers['content-length'], 'string')
 
     if (grantType === 'refresh_token') {
-      assert.equal(req.body.refresh_token, config.refreshToken)
-      assert.equal(req.headers.authorization, credentials)
+      assert.strictEqual(req.body.refresh_token, config.refreshToken)
+      assert.strictEqual(req.headers.authorization, credentials)
 
       return res.send(Querystring.stringify({
         access_token: req.body.test ? config.testRefreshAccessToken : config.refreshAccessToken,
@@ -33,18 +33,18 @@ app.post(
     }
 
     if (grantType === 'authorization_code') {
-      assert.equal(req.body.code, config.code)
-      assert.equal(req.headers.authorization, credentials)
+      assert.strictEqual(req.body.code, config.code)
+      assert.strictEqual(req.headers.authorization, credentials)
     } else if (grantType === 'urn:ietf:params:oauth:grant-type:jwt-bearer') {
-      assert.equal(req.body.assertion, config.jwt)
-      assert.equal(req.headers.authorization, credentials)
+      assert.strictEqual(req.body.assertion, config.jwt)
+      assert.strictEqual(req.headers.authorization, credentials)
     } else if (grantType === 'password') {
-      assert.equal(req.body.username, config.username)
-      assert.equal(req.body.password, config.password)
-      assert.equal(req.headers.authorization, credentials)
+      assert.strictEqual(req.body.username, config.username)
+      assert.strictEqual(req.body.password, config.password)
+      assert.strictEqual(req.headers.authorization, credentials)
     } else {
-      assert.equal(grantType, 'client_credentials')
-      assert.equal(req.headers.authorization, credentials)
+      assert.strictEqual(grantType, 'client_credentials')
+      assert.strictEqual(req.headers.authorization, credentials)
     }
 
     return res.json({
