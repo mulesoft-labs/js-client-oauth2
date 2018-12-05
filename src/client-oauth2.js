@@ -3,7 +3,12 @@ var Querystring = require('querystring')
 var Url = require('url')
 var defaultRequest = require('./request')
 
-var btoa = typeof Buffer === 'function' ? btoaBuffer : window.btoa
+var btoa
+if (typeof Buffer === 'function') {
+  btoa = btoaBuffer
+} else {
+  btoa = window.btoa
+}
 
 /**
  * Export `ClientOAuth2` class.
@@ -80,7 +85,7 @@ var ERROR_RESPONSES = {
  * @return {string}
  */
 function btoaBuffer (string) {
-  return new Buffer(string).toString('base64')
+  return Buffer.from(string).toString('base64')
 }
 
 /**
