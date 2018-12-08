@@ -1,3 +1,7 @@
+# !!! DO NOT USE
+
+This repo and it's contents are a little mod of the [ClientOAuth2](https://github.com/mulesoft/js-client-oauth2) library. It was mod'ed because an API i'm accessing supports OAuth2, but doesn't fully follow the pattern; I don't believe this would be a general use case, hence why I'm hesitant to submit a PR to the main repo 
+
 # Client OAuth 2.0
 
 [![Greenkeeper badge](https://badges.greenkeeper.io/mulesoft/js-client-oauth2.svg)](https://greenkeeper.io/)

@@ -367,7 +367,7 @@ ClientOAuth2Token.prototype.refresh = function (opts) {
   }
 
   return this.client._request(requestOptions({
-    url: options.accessTokenUri,
+    url: options.refreshTokenUri || options.accessTokenUri,
     method: 'POST',
     headers: Object.assign({}, DEFAULT_HEADERS, {
       Authorization: auth(options.clientId, options.clientSecret)
