@@ -23,7 +23,12 @@ app.post(
 
     if (grantType === 'refresh_token') {
       assert.strictEqual(req.body.refresh_token, config.refreshToken)
-      assert.strictEqual(req.headers.authorization, credentials)
+
+      if (req.headers.authorization) {
+        assert.strictEqual(req.headers.authorization, credentials)
+      } else {
+        assert.strictEqual(req.body.client_id, config.clientId)
+      }
 
       return res.send(Querystring.stringify({
         access_token: req.body.test ? config.testRefreshAccessToken : config.refreshAccessToken,
@@ -41,7 +46,12 @@ app.post(
     } else if (grantType === 'password') {
       assert.strictEqual(req.body.username, config.username)
       assert.strictEqual(req.body.password, config.password)
-      assert.strictEqual(req.headers.authorization, credentials)
+
+      if (req.headers.authorization) {
+        assert.strictEqual(req.headers.authorization, credentials)
+      } else {
+        assert.strictEqual(req.body.client_id, config.clientId)
+      }
     } else {
       assert.strictEqual(grantType, 'client_credentials')
       assert.strictEqual(req.headers.authorization, credentials)
