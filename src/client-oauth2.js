@@ -413,19 +413,28 @@ function OwnerFlow (client) {
 OwnerFlow.prototype.getToken = function (username, password, opts) {
   var self = this
   var options = Object.assign({}, this.client.options, opts)
+  var headers = Object.assign({}, DEFAULT_HEADERS)
+  var body = {
+    scope: sanitizeScope(options.scopes),
+    username: username,
+    password: password,
+    grant_type: 'password'
+  }
+
+  // `client_id`: REQUIRED, if the client is not authenticating with the
+  // authorization server as described in Section 3.2.1.
+  // Reference: https://tools.ietf.org/html/rfc6749#section-3.2.1
+  if (options.clientSecret) {
+    headers.Authorization = auth(options.clientId, options.clientSecret)
+  } else {
+    body.client_id = options.clientId
+  }
 
   return this.client._request(requestOptions({
     url: options.accessTokenUri,
     method: 'POST',
-    headers: Object.assign({}, DEFAULT_HEADERS, {
-      Authorization: auth(options.clientId, options.clientSecret)
-    }),
-    body: {
-      scope: sanitizeScope(options.scopes),
-      username: username,
-      password: password,
-      grant_type: 'password'
-    }
+    headers: headers,
+    body: body
   }, options))
     .then(function (data) {
       return self.client.createToken(data)
