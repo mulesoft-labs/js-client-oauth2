@@ -22,6 +22,7 @@ declare namespace ClientOAuth2 {
     clientId?: string
     clientSecret?: string
     accessTokenUri?: string
+    revokeTokenUri?: string
     authorizationUri?: string
     redirectUri?: string
     scopes?: string[]

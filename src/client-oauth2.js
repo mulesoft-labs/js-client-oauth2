@@ -353,6 +353,36 @@ ClientOAuth2Token.prototype.sign = function (requestObject) {
 }
 
 /**
+ * Revoke a user access token.
+ *
+ * @param  {Object}  opts
+ * @return {Promise}
+ */
+ClientOAuth2Token.prototype.revoke = function (opts) {
+  var self = this
+  var options = Object.assign({}, this.client.options, opts)
+
+  if (!this.accessToken) {
+    return Promise.reject(new Error('No Access token'))
+  }
+
+  return this.client._request(requestOptions({
+    url: options.revokeTokenUri,
+    method: 'POST',
+    headers: Object.assign({}, DEFAULT_HEADERS, {
+      Authorization: auth(options.clientId, options.clientSecret)
+    }),
+    body: {
+      token: this.refreshToken,
+      grant_type: 'access_token'
+    }
+  }, options))
+    .then(function (data) {
+      return self.client.createToken()
+    })
+}
+
+/**
  * Refresh a user access token with the supplied token.
  *
  * @param  {Object}  opts
