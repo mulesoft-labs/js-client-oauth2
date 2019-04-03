@@ -166,7 +166,7 @@ function createUri (options, tokenType) {
     scope: sanitizeScope(options.scopes),
     response_type: tokenType,
     state: options.state
-  }, options.query))
+  }, options.query)) + (options.access_type !== undefined ? '&access_type=' + options.access_type : '')
 }
 
 /**
