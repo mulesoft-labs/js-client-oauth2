@@ -1,10 +1,9 @@
 # Client OAuth 2.0
 
-[![Greenkeeper badge](https://badges.greenkeeper.io/mulesoft/js-client-oauth2.svg)](https://greenkeeper.io/)
-
 [![NPM version][npm-image]][npm-url]
 [![NPM downloads][downloads-image]][downloads-url]
 [![Build status][travis-image]][travis-url]
+[![Greenkeeper badge](https://badges.greenkeeper.io/mulesoft/js-client-oauth2.svg)](https://greenkeeper.io/)
 
 > Straight-forward execution of OAuth 2.0 flows and authenticated API requests. 7.58 kB in browsers, after minification and gzipping, 75% from `url` and `querystring` dependencies.
 
