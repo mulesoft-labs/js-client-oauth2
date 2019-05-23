@@ -312,7 +312,7 @@ ClientOAuth2Token.prototype.expiresIn = function (duration) {
     this.expires.setSeconds(this.expires.getSeconds() + Number(duration))
   } else if (duration instanceof Date) {
     this.expires = new Date(duration.getTime())
-  } else if (new Date(duration) !== 'Invalid Date' && !isNaN(new Date(duration))){
+  } else if (new Date(duration) !== 'Invalid Date' && !isNaN(new Date(duration))) {
     this.expires = new Date(duration)
   } else {
     throw new TypeError('Unknown duration: ' + duration)
