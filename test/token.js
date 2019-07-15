@@ -22,6 +22,22 @@ describe('token', function () {
         'scope=notifications&response_type=token&state='
       )
     })
+
+    it('should handle authorization url with existing query param', function () {
+      var client = new ClientOAuth2({
+        clientId: config.clientId,
+        authorizationUri: config.authorizationUri + '?aParam=aValue',
+        authorizationGrants: ['token'],
+        redirectUri: config.redirectUri,
+        scopes: ['notifications']
+      })
+      expect(client.token.getUri()).to.equal(
+        config.authorizationUri + '?aParam=aValue&' +
+        'client_id=abc&' +
+        'redirect_uri=http%3A%2F%2Fexample.com%2Fauth%2Fcallback&' +
+        'scope=notifications&response_type=token&state='
+      )
+    })
   })
 
   describe('#getToken', function () {
