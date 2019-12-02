@@ -4,6 +4,7 @@ declare class ClientOAuth2 {
   owner: ClientOAuth2.OwnerFlow;
   credentials: ClientOAuth2.CredentialsFlow;
   jwt: ClientOAuth2.JwtBearerFlow;
+  options: ClientOAuth2.Options;
 
   constructor(options: ClientOAuth2.Options, request?: ClientOAuth2.Request);
 
