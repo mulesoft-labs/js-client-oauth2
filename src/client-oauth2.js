@@ -582,16 +582,6 @@ CodeFlow.prototype.getToken = function (uri, opts) {
 
   var url = typeof uri === 'object' ? uri : Url.parse(uri, true)
 
-  if (
-    typeof options.redirectUri === 'string' &&
-    typeof url.pathname === 'string' &&
-    url.pathname !== Url.parse(options.redirectUri).pathname
-  ) {
-    return Promise.reject(
-      new TypeError('Redirected path should match configured path, but got: ' + url.pathname)
-    )
-  }
-
   if (!url.query) {
     return Promise.reject(new TypeError('Unable to process uri: ' + uri))
   }

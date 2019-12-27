@@ -36,6 +36,15 @@ describe('code', function () {
         })
     })
 
+    it('uri pathname and redirectUri pathname should not have to match', function () {
+      return githubAuth.code.getToken(uri, {
+        redirectUri: config.redirectUri + '/someOtherJunk'
+      })
+        .then(function (user) {
+          expect(user.accessToken).to.equal(config.accessToken)
+        })
+    })
+
     it('should reject with auth errors', function () {
       var errored = false
 
