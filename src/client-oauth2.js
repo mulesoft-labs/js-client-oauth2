@@ -2,7 +2,7 @@ var Buffer = require('safe-buffer').Buffer
 var Querystring = require('querystring')
 var defaultRequest = require('./request')
 
-const URL_BASE = 'https://example.org/'
+const DEFAULT_URL_BASE = 'https://example.org/'
 
 var btoa
 if (typeof Buffer === 'function') {
@@ -465,8 +465,8 @@ TokenFlow.prototype.getUri = function (opts) {
  */
 TokenFlow.prototype.getToken = function (uri, opts) {
   var options = Object.assign({}, this.client.options, opts)
-  var url = typeof uri === 'object' ? uri : new URL(uri, URL_BASE)
-  var expectedUrl = new URL(options.redirectUri, URL_BASE)
+  var url = typeof uri === 'object' ? uri : new URL(uri, DEFAULT_URL_BASE)
+  var expectedUrl = new URL(options.redirectUri, DEFAULT_URL_BASE)
 
   if (typeof url.pathname === 'string' && url.pathname !== expectedUrl.pathname) {
     return Promise.reject(
@@ -581,12 +581,12 @@ CodeFlow.prototype.getToken = function (uri, opts) {
 
   expects(options, 'clientId', 'accessTokenUri')
 
-  var url = typeof uri === 'object' ? uri : new URL(uri, URL_BASE)
+  var url = typeof uri === 'object' ? uri : new URL(uri, DEFAULT_URL_BASE)
 
   if (
     typeof options.redirectUri === 'string' &&
     typeof url.pathname === 'string' &&
-    url.pathname !== (new URL(options.redirectUri, URL_BASE)).pathname
+    url.pathname !== (new URL(options.redirectUri, DEFAULT_URL_BASE)).pathname
   ) {
     return Promise.reject(
       new TypeError('Redirected path should match configured path, but got: ' + url.pathname)
