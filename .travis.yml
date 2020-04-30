@@ -2,6 +2,9 @@ sudo: false
 
 language: node_js
 
+addons:
+  chrome: stable
+
 env:
   - MOZ_HEADLESS=1
 
