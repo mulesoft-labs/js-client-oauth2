@@ -8,6 +8,9 @@ addons:
 env:
   - MOZ_HEADLESS=1
 
+before_install:
+  google-chrome-stable --headless --disable-gpu --remote-debugging-port=9876 http://localhost &
+
 script: npm run lint && npm run test-server-open && npm run test-node && npm run test-browser
 after_script: npm run test-server-close
 
