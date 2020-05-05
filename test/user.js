@@ -24,7 +24,7 @@ describe('user', function () {
         method: 'GET',
         url: 'http://api.github.com/user',
         headers: {
-          'accept': '*/*'
+          accept: '*/*'
         }
       })
 

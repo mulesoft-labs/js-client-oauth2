@@ -2,6 +2,9 @@ sudo: false
 
 language: node_js
 
+addons:
+  chrome: stable
+
 env:
   - MOZ_HEADLESS=1
 
@@ -9,11 +12,21 @@ script: npm run lint && npm run test-server-open && npm run test-node && npm run
 after_script: npm run test-server-close
 
 node_js:
-  - "8"
-  - "lts/*"
+  - "10"
+  - "12"
+  - "13"
   - "node"
 
 cache:
   directories:
     - node_modules
     - $HOME/.npm
+
+deploy:
+  provider: npm
+  email: "$NPM_EMAIL"
+  api_key: "$NPM_TOKEN"
+  skip_cleanup: true
+  on:
+    tags: true
+    node: "node"
