@@ -35,6 +35,7 @@ declare namespace ClientOAuth2 {
     headers?: {
       [key: string]: string | string[];
     };
+    responseMode?: string;
   }
 
   export interface Request {
