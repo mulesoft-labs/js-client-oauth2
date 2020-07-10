@@ -14,7 +14,7 @@ after_script: npm run test-server-close
 node_js:
   - "10"
   - "12"
-  - "13"
+  - "14"
   - "node"
 
 cache:
