@@ -8,7 +8,7 @@ var btoa
 if (typeof Buffer === 'function') {
   btoa = btoaBuffer
 } else {
-  btoa = window.btoa
+  btoa = window.btoa.bind(window)
 }
 
 /**
