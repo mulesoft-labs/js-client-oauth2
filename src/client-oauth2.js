@@ -497,7 +497,7 @@ TokenFlow.prototype.getToken = function (uri, opts) {
   }
 
   // Check whether the state matches.
-  if (options.state != null && data.state !== options.state) {
+  if (!!options.state && data.state !== options.state) {
     return Promise.reject(new TypeError('Invalid state: ' + data.state))
   }
 
@@ -606,7 +606,7 @@ CodeFlow.prototype.getToken = function (uri, opts) {
     return Promise.reject(err)
   }
 
-  if (options.state != null && data.state !== options.state) {
+  if (!!options.state && data.state !== options.state) {
     return Promise.reject(new TypeError('Invalid state: ' + data.state))
   }
 

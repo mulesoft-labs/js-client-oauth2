@@ -36,6 +36,25 @@ describe('code', function () {
         })
     })
 
+    it('should work with empty state', function () {
+      var githubAuthEmptyState = new ClientOAuth2({
+        clientId: config.clientId,
+        clientSecret: config.clientSecret,
+        accessTokenUri: config.accessTokenUri,
+        authorizationUri: config.authorizationUri,
+        authorizationGrants: ['code'],
+        redirectUri: config.redirectUri,
+        scopes: 'notifications',
+        state: ''
+      })
+      return githubAuthEmptyState.code.getToken(uri)
+        .then(function (user) {
+          expect(user).to.an.instanceOf(ClientOAuth2.Token)
+          expect(user.accessToken).to.equal(config.accessToken)
+          expect(user.tokenType).to.equal('bearer')
+        })
+    })
+
     it('should reject with auth errors', function () {
       var errored = false
 
