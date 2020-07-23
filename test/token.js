@@ -1,4 +1,4 @@
-/* global describe, it */
+/* global describe, it, context */
 var expect = require('chai').expect
 var config = require('./support/config')
 var ClientOAuth2 = require('../')
@@ -21,6 +21,22 @@ describe('token', function () {
         'redirect_uri=http%3A%2F%2Fexample.com%2Fauth%2Fcallback&' +
         'scope=notifications&response_type=token&state='
       )
+    })
+    context('when authorizationUri contains query parameters', function () {
+      it('should preserve query string parameters', function () {
+        const authWithParams = new ClientOAuth2({
+          clientId: config.clientId,
+          authorizationUri: config.authorizationUri + '?bar=qux',
+          authorizationGrants: ['token'],
+          redirectUri: config.redirectUri,
+          scopes: ['notifications']
+        })
+        expect(authWithParams.token.getUri()).to.equal(
+          config.authorizationUri + '?bar=qux&client_id=abc&' +
+          'redirect_uri=http%3A%2F%2Fexample.com%2Fauth%2Fcallback&' +
+          'scope=notifications&response_type=token&state='
+        )
+      })
     })
   })
 
