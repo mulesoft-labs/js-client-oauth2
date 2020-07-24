@@ -19,6 +19,7 @@ describe('owner', function () {
           expect(user).to.an.instanceOf(ClientOAuth2.Token)
           expect(user.accessToken).to.equal(config.accessToken)
           expect(user.tokenType).to.equal('bearer')
+          expect(user.data.scope).to.equal('notifications')
         })
     })
 

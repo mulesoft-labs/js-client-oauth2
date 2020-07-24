@@ -21,7 +21,23 @@ describe('code', function () {
       expect(githubAuth.code.getUri()).to.equal(
         config.authorizationUri + '?client_id=abc&' +
         'redirect_uri=http%3A%2F%2Fexample.com%2Fauth%2Fcallback&' +
-        'scope=notifications&response_type=code&state='
+        'response_type=code&state=&scope=notifications'
+      )
+    })
+    it('should omit empty scopes', function () {
+      var authWithoutScopes = new ClientOAuth2({
+        clientId: config.clientId,
+        clientSecret: config.clientSecret,
+        accessTokenUri: config.accessTokenUri,
+        authorizationUri: config.authorizationUri,
+        authorizationGrants: ['code'],
+        redirectUri: config.redirectUri,
+        scopes: ''
+      })
+      expect(authWithoutScopes.code.getUri()).to.equal(
+        config.authorizationUri + '?client_id=abc&' +
+        'redirect_uri=http%3A%2F%2Fexample.com%2Fauth%2Fcallback&' +
+        'response_type=code&state='
       )
     })
   })

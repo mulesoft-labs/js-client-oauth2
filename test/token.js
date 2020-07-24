@@ -19,7 +19,21 @@ describe('token', function () {
       expect(githubAuth.token.getUri()).to.equal(
         config.authorizationUri + '?client_id=abc&' +
         'redirect_uri=http%3A%2F%2Fexample.com%2Fauth%2Fcallback&' +
-        'scope=notifications&response_type=token&state='
+        'response_type=token&state=&scope=notifications'
+      )
+    })
+    it('should omit empty scopes', function () {
+      var authWithoutScopes = new ClientOAuth2({
+        clientId: config.clientId,
+        authorizationUri: config.authorizationUri,
+        authorizationGrants: ['token'],
+        redirectUri: config.redirectUri,
+        scopes: []
+      })
+      expect(authWithoutScopes.token.getUri()).to.equal(
+        config.authorizationUri + '?client_id=abc&' +
+        'redirect_uri=http%3A%2F%2Fexample.com%2Fauth%2Fcallback&' +
+        'response_type=token&state='
       )
     })
   })
