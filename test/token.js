@@ -48,7 +48,7 @@ describe('token', function () {
         expect(authWithParams.token.getUri()).to.equal(
           config.authorizationUri + '?bar=qux&client_id=abc&' +
           'redirect_uri=http%3A%2F%2Fexample.com%2Fauth%2Fcallback&' +
-          'scope=notifications&response_type=token&state='
+          'response_type=token&state=&scope=notifications'
         )
       })
     })

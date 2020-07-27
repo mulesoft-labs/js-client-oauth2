@@ -54,7 +54,7 @@ describe('code', function () {
         expect(authWithParams.code.getUri()).to.equal(
           config.authorizationUri + '?bar=qux&client_id=abc&' +
           'redirect_uri=http%3A%2F%2Fexample.com%2Fauth%2Fcallback&' +
-          'scope=notifications&response_type=code&state='
+          'response_type=code&state=&scope=notifications'
         )
       })
     })
