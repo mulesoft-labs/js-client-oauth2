@@ -161,7 +161,9 @@ function createUri (options, tokenType) {
   // Check the required parameters are set.
   expects(options, 'clientId', 'authorizationUri')
 
-  return options.authorizationUri + '?' + Querystring.stringify(Object.assign({
+  const sep = options.authorizationUri.includes('?') ? '&' : '?'
+
+  return options.authorizationUri + sep + Querystring.stringify(Object.assign({
     client_id: options.clientId,
     redirect_uri: options.redirectUri,
     scope: sanitizeScope(options.scopes),
