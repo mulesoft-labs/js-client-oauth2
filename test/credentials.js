@@ -19,6 +19,24 @@ describe('credentials', function () {
           expect(user).to.an.instanceOf(ClientOAuth2.Token)
           expect(user.accessToken).to.equal(config.accessToken)
           expect(user.tokenType).to.equal('bearer')
+          expect(user.data.scope).to.equal('notifications')
+        })
+    })
+
+    it('should not include empty scopes in auth server request', function () {
+      var scopelessAuth = new ClientOAuth2({
+        clientId: config.clientId,
+        clientSecret: config.clientSecret,
+        accessTokenUri: config.accessTokenUri,
+        authorizationGrants: ['credentials'],
+        scopes: []
+      })
+      return scopelessAuth.credentials.getToken()
+        .then(function (user) {
+          expect(user).to.an.instanceOf(ClientOAuth2.Token)
+          expect(user.accessToken).to.equal(config.accessToken)
+          expect(user.tokenType).to.equal('bearer')
+          expect(user.data.scope).to.equal(undefined)
         })
     })
 

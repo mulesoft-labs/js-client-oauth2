@@ -9,7 +9,7 @@ describe('owner', function () {
     clientSecret: config.clientSecret,
     accessTokenUri: config.accessTokenUri,
     authorizationGrants: ['owner'],
-    scope: 'notifications'
+    scopes: 'notifications'
   })
 
   describe('#getToken', function () {
@@ -20,6 +20,23 @@ describe('owner', function () {
           expect(user.accessToken).to.equal(config.accessToken)
           expect(user.tokenType).to.equal('bearer')
           expect(user.data.scope).to.equal('notifications')
+        })
+    })
+
+    it('should not include empty scopes in auth erver request', function () {
+      var scopelessAuth = new ClientOAuth2({
+        clientId: config.clientId,
+        clientSecret: config.clientSecret,
+        accessTokenUri: config.accessTokenUri,
+        authorizationGrants: ['owner'],
+        scope: ''
+      })
+      return scopelessAuth.owner.getToken(config.username, config.password)
+        .then(function (user) {
+          expect(user).to.an.instanceOf(ClientOAuth2.Token)
+          expect(user.accessToken).to.equal(config.accessToken)
+          expect(user.tokenType).to.equal('bearer')
+          expect(user.data.scope).to.equal(undefined)
         })
     })
 

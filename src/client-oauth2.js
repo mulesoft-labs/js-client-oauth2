@@ -426,7 +426,6 @@ OwnerFlow.prototype.getToken = function (username, password, opts) {
     password: password,
     grant_type: 'password'
   }
-
   if (options.scopes && options.scopes.length > 0) {
     body.scope = sanitizeScope(options.scopes)
   }
