@@ -46,7 +46,7 @@ app.post(
       assert.strictEqual(grantType, 'client_credentials')
       assert.strictEqual(req.headers.authorization, credentials)
     }
-    console.log(req.body.scope)
+
     return res.json({
       access_token: config.accessToken,
       refresh_token: config.refreshToken,
