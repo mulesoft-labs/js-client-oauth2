@@ -168,7 +168,8 @@ function createUri (options, tokenType) {
     redirect_uri: options.redirectUri,
     scope: sanitizeScope(options.scopes),
     response_type: tokenType,
-    state: options.state
+    state: options.state,
+    response_mode: options.responseMode || "query"
   }, options.query))
 }
 
@@ -625,6 +626,8 @@ CodeFlow.prototype.getToken = function (uri, opts) {
   // Reference: https://tools.ietf.org/html/rfc6749#section-3.2.1
   if (options.clientSecret) {
     headers.Authorization = auth(options.clientId, options.clientSecret)
+    body.client_id = options.clientId
+    body.client_secret = options.clientSecret
   } else {
     body.client_id = options.clientId
   }
