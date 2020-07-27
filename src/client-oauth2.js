@@ -171,7 +171,8 @@ function createUri (options, tokenType) {
     qs.scope = sanitizeScope(options.scopes)
   }
 
-  return options.authorizationUri + '?' + Querystring.stringify(
+  const sep = options.authorizationUri.includes('?') ? '&' : '?'
+  return options.authorizationUri + sep + Querystring.stringify(
     Object.assign(qs, options.query))
 }
 
