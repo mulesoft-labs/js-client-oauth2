@@ -300,7 +300,7 @@ function ClientOAuth2Token (client, data) {
   this.accessToken = data.access_token
   this.refreshToken = data.refresh_token
 
-  this.expiresIn(Number(data.expires_in))
+  this.expiresIn(data.expires_in)
 }
 
 /**
@@ -310,11 +310,13 @@ function ClientOAuth2Token (client, data) {
  * @return {Date}
  */
 ClientOAuth2Token.prototype.expiresIn = function (duration) {
-  if (typeof duration === 'number') {
+  if (typeof duration === 'number' || typeof Number(duration) === 'number') {
     this.expires = new Date()
-    this.expires.setSeconds(this.expires.getSeconds() + duration)
+    this.expires.setSeconds(this.expires.getSeconds() + Number(duration))
   } else if (duration instanceof Date) {
     this.expires = new Date(duration.getTime())
+  } else if (new Date(duration) !== 'Invalid Date' && !isNaN(new Date(duration))) {
+    this.expires = new Date(duration)
   } else {
     throw new TypeError('Unknown duration: ' + duration)
   }
