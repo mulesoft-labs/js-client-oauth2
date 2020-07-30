@@ -167,7 +167,7 @@ function createUri (options, tokenType) {
     response_type: tokenType,
     state: options.state
   }
-  if (options.scopes && options.scopes.length > 0) {
+  if (options.scopes !== undefined) {
     qs.scope = sanitizeScope(options.scopes)
   }
 
@@ -426,7 +426,7 @@ OwnerFlow.prototype.getToken = function (username, password, opts) {
     password: password,
     grant_type: 'password'
   }
-  if (options.scopes && options.scopes.length > 0) {
+  if (options.scopes !== undefined) {
     body.scope = sanitizeScope(options.scopes)
   }
 
@@ -542,7 +542,7 @@ CredentialsFlow.prototype.getToken = function (opts) {
     grant_type: 'client_credentials'
   }
 
-  if (options.scopes && options.scopes.length > 0) {
+  if (options.scopes !== undefined) {
     body.scope = sanitizeScope(options.scopes)
   }
 
@@ -689,7 +689,7 @@ JwtBearerFlow.prototype.getToken = function (token, opts) {
     assertion: token
   }
 
-  if (options.scopes && options.scopes.length > 0) {
+  if (options.scopes !== undefined) {
     body.scope = sanitizeScope(options.scopes)
   }
 
