@@ -1,4 +1,4 @@
-/* global describe, it */
+/* global describe, it, context */
 var expect = require('chai').expect
 var config = require('./support/config')
 var ClientOAuth2 = require('../')
@@ -19,7 +19,61 @@ describe('jwt', function () {
           expect(user).to.an.instanceOf(ClientOAuth2.Token)
           expect(user.accessToken).to.equal(config.accessToken)
           expect(user.tokenType).to.equal('bearer')
+          expect(user.data.scope).to.equal('notifications')
         })
+    })
+    context('when scopes are undefined', function () {
+      it('should not send scopes to an auth server', function () {
+        var scopelessAuth = new ClientOAuth2({
+          clientId: config.clientId,
+          clientSecret: config.clientSecret,
+          accessTokenUri: config.accessTokenUri,
+          authorizationGrants: ['jwt']
+        })
+        return scopelessAuth.jwt.getToken(config.jwt)
+          .then(function (user) {
+            expect(user).to.an.instanceOf(ClientOAuth2.Token)
+            expect(user.accessToken).to.equal(config.accessToken)
+            expect(user.tokenType).to.equal('bearer')
+            expect(user.data.scope).to.equal(undefined)
+          })
+      })
+    })
+    context('when scopes are an empty array', function () {
+      it('should send empty scope string to an auth server', function () {
+        var scopelessAuth = new ClientOAuth2({
+          clientId: config.clientId,
+          clientSecret: config.clientSecret,
+          accessTokenUri: config.accessTokenUri,
+          authorizationGrants: ['jwt'],
+          scopes: []
+        })
+        return scopelessAuth.jwt.getToken(config.jwt)
+          .then(function (user) {
+            expect(user).to.an.instanceOf(ClientOAuth2.Token)
+            expect(user.accessToken).to.equal(config.accessToken)
+            expect(user.tokenType).to.equal('bearer')
+            expect(user.data.scope).to.equal('')
+          })
+      })
+    })
+    context('when scopes are an empty array', function () {
+      it('should send empty scope string to an auth server', function () {
+        var scopelessAuth = new ClientOAuth2({
+          clientId: config.clientId,
+          clientSecret: config.clientSecret,
+          accessTokenUri: config.accessTokenUri,
+          authorizationGrants: ['jwt'],
+          scopes: ''
+        })
+        return scopelessAuth.jwt.getToken(config.jwt)
+          .then(function (user) {
+            expect(user).to.an.instanceOf(ClientOAuth2.Token)
+            expect(user.accessToken).to.equal(config.accessToken)
+            expect(user.tokenType).to.equal('bearer')
+            expect(user.data.scope).to.equal('')
+          })
+      })
     })
 
     describe('#sign', function () {
