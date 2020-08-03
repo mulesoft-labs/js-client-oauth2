@@ -21,7 +21,56 @@ describe('code', function () {
       expect(githubAuth.code.getUri()).to.equal(
         config.authorizationUri + '?client_id=abc&' +
         'redirect_uri=http%3A%2F%2Fexample.com%2Fauth%2Fcallback&' +
-        'scope=notifications&response_type=code&state='
+        'response_type=code&state=&scope=notifications'
+      )
+    })
+    context('when scopes are undefined', function () {
+      it('should not include scope in the uri', function () {
+        var authWithoutScopes = new ClientOAuth2({
+          clientId: config.clientId,
+          clientSecret: config.clientSecret,
+          accessTokenUri: config.accessTokenUri,
+          authorizationUri: config.authorizationUri,
+          authorizationGrants: ['code'],
+          redirectUri: config.redirectUri
+        })
+        expect(authWithoutScopes.code.getUri()).to.equal(
+          config.authorizationUri + '?client_id=abc&' +
+          'redirect_uri=http%3A%2F%2Fexample.com%2Fauth%2Fcallback&' +
+          'response_type=code&state='
+        )
+      })
+    })
+    it('should include empty scopes array as an empty string', function () {
+      var authWithEmptyScopes = new ClientOAuth2({
+        clientId: config.clientId,
+        clientSecret: config.clientSecret,
+        accessTokenUri: config.accessTokenUri,
+        authorizationUri: config.authorizationUri,
+        authorizationGrants: ['code'],
+        redirectUri: config.redirectUri,
+        scopes: []
+      })
+      expect(authWithEmptyScopes.code.getUri()).to.equal(
+        config.authorizationUri + '?client_id=abc&' +
+        'redirect_uri=http%3A%2F%2Fexample.com%2Fauth%2Fcallback&' +
+        'response_type=code&state=&scope='
+      )
+    })
+    it('should include empty scopes string as an empty string', function () {
+      var authWithEmptyScopes = new ClientOAuth2({
+        clientId: config.clientId,
+        clientSecret: config.clientSecret,
+        accessTokenUri: config.accessTokenUri,
+        authorizationUri: config.authorizationUri,
+        authorizationGrants: ['code'],
+        redirectUri: config.redirectUri,
+        scopes: ''
+      })
+      expect(authWithEmptyScopes.code.getUri()).to.equal(
+        config.authorizationUri + '?client_id=abc&' +
+        'redirect_uri=http%3A%2F%2Fexample.com%2Fauth%2Fcallback&' +
+        'response_type=code&state=&scope='
       )
     })
     context('when authorizationUri contains query parameters', function () {
@@ -38,7 +87,7 @@ describe('code', function () {
         expect(authWithParams.code.getUri()).to.equal(
           config.authorizationUri + '?bar=qux&client_id=abc&' +
           'redirect_uri=http%3A%2F%2Fexample.com%2Fauth%2Fcallback&' +
-          'scope=notifications&response_type=code&state='
+          'response_type=code&state=&scope=notifications'
         )
       })
     })

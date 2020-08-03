@@ -51,7 +51,7 @@ app.post(
       access_token: config.accessToken,
       refresh_token: config.refreshToken,
       token_type: 'bearer',
-      scope: 'notifications'
+      scope: req.body.scope
     })
   }
 )
