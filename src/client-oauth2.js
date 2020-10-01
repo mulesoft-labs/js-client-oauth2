@@ -373,16 +373,26 @@ ClientOAuth2Token.prototype.refresh = function (opts) {
     return Promise.reject(new Error('No refresh token'))
   }
 
+  var headers = Object.assign({}, DEFAULT_HEADERS)
+  var body = {
+    refresh_token: this.refreshToken,
+    grant_type: 'refresh_token'
+  }
+
+  if (options.clientSecret) {
+    if (options.sendClientCredentialsInBody) {
+      body.client_id = options.clientId
+      body.client_secret = options.clientSecret
+    } else {
+      headers.Authorization = auth(options.clientId, options.clientSecret)
+    }
+  }
+
   return this.client._request(requestOptions({
     url: options.accessTokenUri,
     method: 'POST',
-    headers: Object.assign({}, DEFAULT_HEADERS, {
-      Authorization: auth(options.clientId, options.clientSecret)
-    }),
-    body: {
-      refresh_token: this.refreshToken,
-      grant_type: 'refresh_token'
-    }
+    headers: headers,
+    body: body
   }, options))
     .then(function (data) {
       return self.client.createToken(Object.assign({}, self.data, data))
@@ -430,12 +440,21 @@ OwnerFlow.prototype.getToken = function (username, password, opts) {
     body.scope = sanitizeScope(options.scopes)
   }
 
+  var headers = Object.assign({}, DEFAULT_HEADERS)
+
+  if (options.clientSecret) {
+    if (options.sendClientCredentialsInBody) {
+      body.client_id = options.clientId
+      body.client_secret = options.clientSecret
+    } else {
+      headers.Authorization = auth(options.clientId, options.clientSecret)
+    }
+  }
+
   return this.client._request(requestOptions({
     url: options.accessTokenUri,
     method: 'POST',
-    headers: Object.assign({}, DEFAULT_HEADERS, {
-      Authorization: auth(options.clientId, options.clientSecret)
-    }),
+    headers: headers,
     body: body
   }, options))
     .then(function (data) {
@@ -546,12 +565,19 @@ CredentialsFlow.prototype.getToken = function (opts) {
     body.scope = sanitizeScope(options.scopes)
   }
 
+  var headers = Object.assign({}, DEFAULT_HEADERS)
+
+  if (options.sendClientCredentialsInBody) {
+    body.client_id = options.clientId
+    body.client_secret = options.clientSecret
+  } else {
+    headers.Authorization = auth(options.clientId, options.clientSecret)
+  }
+
   return this.client._request(requestOptions({
     url: options.accessTokenUri,
     method: 'POST',
-    headers: Object.assign({}, DEFAULT_HEADERS, {
-      Authorization: auth(options.clientId, options.clientSecret)
-    }),
+    headers: headers,
     body: body
   }, options))
     .then(function (data) {
@@ -637,7 +663,12 @@ CodeFlow.prototype.getToken = function (uri, opts) {
   // authorization server as described in Section 3.2.1.
   // Reference: https://tools.ietf.org/html/rfc6749#section-3.2.1
   if (options.clientSecret) {
-    headers.Authorization = auth(options.clientId, options.clientSecret)
+    if (options.sendClientCredentialsInBody) {
+      body.client_id = options.clientId
+      body.client_secret = options.clientSecret
+    } else {
+      headers.Authorization = auth(options.clientId, options.clientSecret)
+    }
   } else {
     body.client_id = options.clientId
   }
@@ -678,15 +709,20 @@ JwtBearerFlow.prototype.getToken = function (token, opts) {
 
   expects(options, 'accessTokenUri')
 
-  // Authentication of the client is optional, as described in
-  // Section 3.2.1 of OAuth 2.0 [RFC6749]
-  if (options.clientId) {
-    headers.Authorization = auth(options.clientId, options.clientSecret)
-  }
-
   const body = {
     grant_type: 'urn:ietf:params:oauth:grant-type:jwt-bearer',
     assertion: token
+  }
+
+  // Authentication of the client is optional, as described in
+  // Section 3.2.1 of OAuth 2.0 [RFC6749]
+  if (options.clientSecret) {
+    if (options.sendClientCredentialsInBody) {
+      body.client_id = options.clientId
+      body.client_secret = options.clientSecret
+    } else {
+      headers.Authorization = auth(options.clientId, options.clientSecret)
+    }
   }
 
   if (options.scopes !== undefined) {

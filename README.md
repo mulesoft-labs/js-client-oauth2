@@ -41,6 +41,7 @@ var githubAuth = new ClientOAuth2({
 * **redirectUri** A custom url for the provider to redirect users back to your application (only required for `token` and `code`)
 * **scopes** An array of scopes to authenticate against
 * **state** Nonce sent back with the redirect when authorization is complete to verify authenticity (should be random for every request)
+* **sendClientCredentialsInBody** If set to true, the clientSecret will be sent along with the [body instead by using Authorization header](https://tools.ietf.org/html/rfc6749#section-2.3.1)
 
 ### Request options
 
