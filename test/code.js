@@ -5,6 +5,13 @@ var ClientOAuth2 = require('../')
 
 describe('code', function () {
   var uri = '/auth/callback?code=' + config.code + '&state=' + config.state
+  var uriObject = {
+    pathname: '/auth/callback',
+    search: {
+      code: config.code,
+      state: config.state
+    }
+  }
 
   var githubAuth = new ClientOAuth2({
     clientId: config.clientId,
@@ -96,6 +103,15 @@ describe('code', function () {
   describe('#getToken', function () {
     it('should request the token', function () {
       return githubAuth.code.getToken(uri)
+        .then(function (user) {
+          expect(user).to.an.instanceOf(ClientOAuth2.Token)
+          expect(user.accessToken).to.equal(config.accessToken)
+          expect(user.tokenType).to.equal('bearer')
+        })
+    })
+
+    it('should work with an url object', function () {
+      return githubAuth.code.getToken(uriObject)
         .then(function (user) {
           expect(user).to.an.instanceOf(ClientOAuth2.Token)
           expect(user.accessToken).to.equal(config.accessToken)

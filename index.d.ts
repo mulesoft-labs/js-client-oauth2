@@ -52,7 +52,7 @@ declare namespace ClientOAuth2 {
     hash?: string | {
       [key: string]: string | string[];
     };
-    query?: string | {
+    search?: string | {
       [key: string]: string | string[];
     }
     pathname?: string;

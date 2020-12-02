@@ -608,7 +608,7 @@ CodeFlow.prototype.getToken = function (uri, opts) {
     )
   }
 
-  if (!url.search || !url.search.substr(1)) {
+  if (!url.search || (typeof url.search === 'string' && !url.search.substr(1))) {
     return Promise.reject(new TypeError('Unable to process uri: ' + uri))
   }
 
