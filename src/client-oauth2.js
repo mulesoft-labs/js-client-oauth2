@@ -636,10 +636,15 @@ CodeFlow.prototype.getToken = function (uri, opts) {
   // `client_id`: REQUIRED, if the client is not authenticating with the
   // authorization server as described in Section 3.2.1.
   // Reference: https://tools.ietf.org/html/rfc6749#section-3.2.1
-  if (options.clientSecret) {
-    headers.Authorization = auth(options.clientId, options.clientSecret)
-  } else {
+  if (options.clientCredentialsInBody) {
     body.client_id = options.clientId
+    body.client_secret = options.clientSecret
+  } else {
+    if (options.clientSecret) {
+      headers.Authorization = auth(options.clientId, options.clientSecret)
+    } else {
+      body.client_id = options.clientId
+    }
   }
 
   return this.client._request(requestOptions({

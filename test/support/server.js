@@ -34,7 +34,12 @@ app.post(
 
     if (grantType === 'authorization_code') {
       assert.strictEqual(req.body.code, config.code)
-      assert.strictEqual(req.headers.authorization, credentials)
+      if (req.headers.authorization) {
+        assert.strictEqual(req.headers.authorization, credentials)
+      } else {
+        assert.strictEqual(req.body.client_id, config.clientId)
+        assert.strictEqual(req.body.client_secret, config.clientSecret)
+      }
     } else if (grantType === 'urn:ietf:params:oauth:grant-type:jwt-bearer') {
       assert.strictEqual(req.body.assertion, config.jwt)
       assert.strictEqual(req.headers.authorization, credentials)

@@ -103,6 +103,16 @@ describe('code', function () {
         })
     })
 
+    it('should request the token with body credentials', function () {
+      const opts = { clientCredentialsInBody: true }
+      return githubAuth.code.getToken(uri, opts)
+        .then(function (user) {
+          expect(user).to.an.instanceOf(ClientOAuth2.Token)
+          expect(user.accessToken).to.equal(config.accessToken)
+          expect(user.tokenType).to.equal('bearer')
+        })
+    })
+
     it('should reject with auth errors', function () {
       var errored = false
 
