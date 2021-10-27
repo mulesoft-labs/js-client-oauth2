@@ -391,7 +391,7 @@ ClientOAuth2Token.prototype.refresh = function (opts) {
 
 /**
  * Check whether the token has expired.
- *
+ * @param  {number}  clockTolerance
  * @return {boolean}
  */
 ClientOAuth2Token.prototype.expired = function (clockTolerance) {
