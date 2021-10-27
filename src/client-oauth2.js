@@ -394,8 +394,9 @@ ClientOAuth2Token.prototype.refresh = function (opts) {
  *
  * @return {boolean}
  */
-ClientOAuth2Token.prototype.expired = function () {
-  return Date.now() > this.expires.getTime()
+ClientOAuth2Token.prototype.expired = function (clockTolerance) {
+  const clockToleranceMs = (clockTolerance||0) *1000;
+  return Date.now() > this.expires.getTime() + clockToleranceMs;
 }
 
 /**
