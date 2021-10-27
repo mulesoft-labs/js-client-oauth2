@@ -10,7 +10,7 @@
 ## Installation
 
 ```sh
-npm install client-oauth2 --save
+npm install @livescale/client-oauth2 --save
 ```
 
 ## Usage
