@@ -4,11 +4,13 @@ var defaultRequest = require('./request')
 
 const DEFAULT_URL_BASE = 'https://example.org/'
 
-var btoa
+var safeBtoa
 if (typeof Buffer === 'function') {
-  btoa = btoaBuffer
+  safeBtoa = btoaBuffer
+} else if (typeof window !== 'undefined') {
+  safeBtoa = window.btoa.bind(window)
 } else {
-  btoa = window.btoa.bind(window)
+  safeBtoa = btoa
 }
 
 /**
@@ -184,7 +186,7 @@ function createUri (options, tokenType) {
  * @return {string}
  */
 function auth (username, password) {
-  return 'Basic ' + btoa(toString(username) + ':' + toString(password))
+  return 'Basic ' + safeBtoa(toString(username) + ':' + toString(password))
 }
 
 /**
